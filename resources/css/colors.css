@@ -1,0 +1,15 @@
+.color-black {
+    @apply text-black;
+}
+
+.color-yellow {
+    @apply text-yellow-300;
+}
+
+.color-blue {
+    @apply text-blue-500;
+}
+
+.color-magenta {
+    @apply text-purple-400;
+}
