@@ -1,63 +1,86 @@
 <script setup>
 import { Link } from '@inertiajs/inertia-vue3'
 import { usePage } from '@inertiajs/inertia-vue3'
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 
 const page = usePage()
 const can = computed(() => page.props.value.canGlobal)
+const urls = inject('urls')
 
-function isUrl(...urls) {
-    let currentUrl = page.url.value.substring(1)
-    if (urls[0] === '') {
-        return currentUrl === ''
+const isUrl = (...urls) => {    
+    let currentUrl = page.url.value    
+    if (urls[0] === '/') {
+        return currentUrl === '/'
     }
     return urls.filter((url) => currentUrl.startsWith(url)).length
 }
+const classIsActive = `text-white`
+const classIsInactive = `text-indigo-300 group-hover:text-white`
+const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-indigo-700 group`
+
 </script>
+<template>    
+    <div class="h-full px-3 py-4 overflow-y-auto">
+        <ul class="space-y-2 font-medium">
+            <li>
+                <Link :href="urls.home" :class="[isUrl(urls.home) ? classIsActive : classIsInactive, classLink]">
+                    <i class="fas fa-home me-3 w-5 h-5"></i>
+                    Главная
+                </Link>
+            </li>
 
-<template>
-<div class="">
-    
-    <div class="mb-4">
-        <Link class="group flex items-center py-3" href="/">
-            <div :class="isUrl('') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
-                <i class="fas fa-home"></i> Главная
-            </div>            
-        </Link>
+            <li v-if="can.admin">
+                <Link :href="urls.users.index()" :class="[isUrl(urls.users.index()) ? classIsActive : classIsInactive, classLink]">
+                    <i class="fas fa-user me-3 w-5 h-5"></i>
+                    Пользователи
+                </Link>
+            </li>
+
+            <li>
+                <Link :href="urls.printers.index()" :class="[isUrl(urls.printers.index()) ? classIsActive : classIsInactive, classLink]">
+                    <i class="fas fa-print me-3 w-5 h-5"></i>
+                    Принтеры
+                </Link>
+            </li>
+
+            <li>
+                <Link :href="urls.consumables.counts.index()" :class="[isUrl(urls.consumables.counts.index()) ? classIsActive : classIsInactive, classLink]">
+                    <i class="fas fa-list-ol me-3 w-5 h-5"></i>
+                    Количество расходных материалов
+                </Link>
+            </li>
+            
+            <li>
+                <button type="button" :class="[`w-full text-indigo-300 transition duration-75`, classLink]" aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">                  
+                    <i class="fas fa-cube me-3 w-5 h-5"></i>
+                    <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Справочники</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                </button>
+                <ul id="dropdown-example" class="hidden py-2 space-y-2">
+                    <li>
+                        <Link :href="urls.dictionary.printers.index()" :class="[isUrl(urls.dictionary.printers.index()) ? classIsActive : classIsInactive, classLink, 'pl-11']">
+                            <i class="fas fa-print me-3 w-5 h-5"></i>
+                            Принтеры
+                        </Link>
+                    </li>
+                    <li>
+                        <Link :href="urls.dictionary.consumables.index()" :class="[isUrl(urls.dictionary.consumables.index()) ? classIsActive : classIsInactive, classLink, 'pl-11']">
+                            <i class="fas fa-box me-3 w-5 h-5"></i>
+                            Расходные материалы
+                        </Link>
+                    </li>
+                    <li>
+                        <Link :href="urls.dictionary.organizations.index()" :class="[isUrl(urls.dictionary.organizations.index()) ? classIsActive : classIsInactive, classLink, 'pl-11']">
+                            <i class="fa-solid fa-sitemap me-3 w-5 h-5"></i>
+                            Организации
+                        </Link>
+                    </li>             
+                </ul>
+            </li>
+
+            
+        </ul>
     </div>
-
-    <div class="mb-4">
-        <Link class="group flex items-center py-3" href="/chart">
-            <div :class="isUrl('chart') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
-                <i class="fas fa-chart-pie"></i> График
-            </div>
-        </Link>
-    </div>
-
-    <div class="mb-4">
-        <Link class="group flex items-center py-3" href="/consumable-moves">            
-            <div :class="isUrl('consumable-moves') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
-                <i class="fas fa-scroll"></i> Журнал
-            </div>
-        </Link>
-    </div>  
-
-    <div class="mb-4" v-if="can.editorStock | can.editorLocal">
-        <Link class="group flex items-center py-3" href="/printers">            
-            <div :class="isUrl('printers') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
-                <i class="fas fa-print"></i> Принтеры и расходные материалы (справочник)
-            </div>
-        </Link>
-    </div>   
-    
-    <div class="mb-4" v-if="can.admin">
-        <Link class="group flex items-center py-3" href="/users">            
-            <div :class="isUrl('users') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
-                <i class="fas fa-user"></i> Пользователи
-            </div>
-        </Link>
-    </div>  
-   
-
-</div>
 </template>

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ConsumableRequest;
-use App\Models\CartridgeColors;
-use App\Models\ConsumableTypes;
-use App\Models\Printer;
-use App\Models\PrinterConsumable;
+use App\Models\Consumable\CartridgeColors;
+use App\Models\Consumable\ConsumableTypes;
+use App\Models\Consumable\ConsumableTypesEnum;
+use App\Models\Printer\Printer;
+use App\Models\Printer\PrinterConsumable;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Request;
 
@@ -14,7 +16,7 @@ class ConsumablesController extends Controller
 {
     
     public function index()
-    {
+    {        
         return Inertia::render('Dashboard/Index', [
             'filters' => Request::all(['search']),
             'consumables' => PrinterConsumable::filter(Request::only(['search']))->get()
@@ -38,15 +40,15 @@ class ConsumablesController extends Controller
                         'updated_at' => $printer->updated_at,
                     ])->first(),
                 ]),
-            'typesConsumables' => ConsumableTypes::asArray(),
-            'cartridgeColors' => CartridgeColors::asArray(),
+            'typesConsumables' => ConsumableTypesEnum::array(),
+            'cartridgeColors' => CartridgeColors::get(),
             'labelsConsumable' => PrinterConsumable::labels(),
         ]);
     }
 
     public function create(Printer $printer)
     {     
-        $types = ConsumableTypes::asArray();        
+        $types = ConsumableTypesEnum::array();        
         return Inertia::render('Consumable/Form', [
             'isNew' => true,
             'printer' => $printer,

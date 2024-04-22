@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('photo_path', 100)->nullable();
 
             $table->string('domain', 50)->default('local');
-            $table->string('org_code', 5)->default('0000');
+            $table->string('org_code', 5);
             $table->string('company', 500)->nullable();
             $table->string('fio', 250)->nullable();
             $table->string('department', 250)->nullable();
@@ -33,7 +33,7 @@ class CreateUsersTable extends Migration
             
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
+            $table->softDeletes();            
         });
     }
 

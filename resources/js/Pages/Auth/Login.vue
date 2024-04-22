@@ -1,11 +1,15 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-import Logo from '@/Shared/Logo'
+import Panel from 'primevue/panel';
 import LoadingButton from '@/Shared/LoadingButton'
 import InputText from 'primevue/inputtext';
+import InlineMessage from 'primevue/inlinemessage';
+import Checkbox from 'primevue/checkbox';
+import Label from '@/Shared/Label'
+
 
 const form = useForm({
-    email: 'oleg@oleg.ru',
+    email: 'admin@example.com',
     password: 'secret',
     remember: false,
 })
@@ -13,61 +17,59 @@ const form = useForm({
 function login() {
     form.post('/login')
 }
+
 </script>
 
 <template>
-    <Head title="Login" />
-    <div class="flex items-center justify-center p-6 min-h-screen bg-indigo-800">
-        <div class="w-full max-w-md">
-            <logo class="block mx-auto w-full max-w-xs fill-white" height="50" />
-            <form class="mt-8 bg-white rounded-lg shadow-xl overflow-hidden" @submit.prevent="login">
-                <div class="px-10 py-12">
-                    <h1 class="text-center text-3xl font-bold">Welcome Back!</h1>
-                    <div class="mt-6 mx-auto w-24 border-b-2" />
-                    <input-text v-model="form.email" :error="form.errors.email" class="mt-10" label="Email" type="email"
-                        autofocus autocapitalize="off" />
-                    <input-text v-model="form.password" :error="form.errors.password" class="mt-6" label="Password"
-                        type="password" />
-                    <label class="flex items-center mt-6 select-none" for="remember">
-                        <input id="remember" v-model="form.remember" class="mr-1" type="checkbox" />
-                        <span class="text-sm">Remember Me</span>
-                    </label>
+    <Head title="Аутентификация" />
+
+    <div class="flex items-center justify-center p-6 min-h-screen bg-indigo-800">           
+        <Panel header="Аутентификация" class="w-full max-w-md">            
+            <template #footer>
+                <div class="flex justify-end">
+                    <loading-button :loading="form.processing" @click="login" class="btn-indigo" type="button">Вход</loading-button>
                 </div>
-                <div class="flex px-10 py-4 bg-gray-100 border-t border-gray-100">
-                    <loading-button :loading="form.processing" class="btn-indigo ml-auto"
-                        type="submit">Login</loading-button>
+            </template>
+            <form @submit.prevent="login">
+                <div class="grid grid-cols-1 grid-rows-1 gap-4">                    
+                    <div>  
+                        <input-text v-model="form.email" :invalid="form.errors?.email?.length > 0" 
+                            class="w-full" label="Email" type="email" autofocus autocapitalize="off" />
+                        <InlineMessage v-if="form.errors?.email" class="mt-2" severity="error">{{ form.errors?.email }}</InlineMessage>
+                    </div>
+                    <div>  
+                        <input-text v-model="form.password" :invalid="form.errors?.password?.length > 0" 
+                            class="w-full" label="Password" type="password" />
+                        <InlineMessage v-if="form.errors?.password" class="mt-2" severity="error">{{ form.errors?.password }}</InlineMessage>
+                    </div>
+                    <div>
+                        <div class="flex">
+                            <Checkbox v-model="form.remember" inputId="remember" name="remember" value="remember" />
+                            <Label class="ml-2" for="remember">Запомнить</Label>
+                        </div>
+                    </div>
                 </div>
             </form>
-        </div>
+                
+                <!-- <div class="px-10 py-6">                    
+                    <div>  
+                        <input-text v-model="form.email" :invalid="form.errors?.email?.length > 0" 
+                            class="w-full" label="Email" type="email" autofocus autocapitalize="off" />
+                        <InlineMessage v-if="form.errors?.email" class="mt-2" severity="error">{{ form.errors?.email }}</InlineMessage>
+                    </div>
+                    <div class="mt-8">  
+                        <input-text v-model="form.password" :invalid="form.errors?.password?.length > 0" 
+                            class="w-full" label="Password" type="password" />
+                        <InlineMessage v-if="form.errors?.password" class="mt-2" severity="error">{{ form.errors?.password }}</InlineMessage>
+                    </div>
+                    <div class="mt-8">
+                        <div class="sm:col-span-4 flex">                        
+                            <Checkbox v-model="form.remember" inputId="remember" name="remember" value="remember" />        
+                            <Label class="ml-2" for="remember">Запомнить</Label>                  
+                        </div>
+                    </div>
+                </div>                 -->
+        </Panel>
+        <!-- </form> -->
     </div>
 </template>
-
-<!-- <script>
-import { Head } from '@inertiajs/inertia-vue3'
-import Logo from '@/Shared/Logo'
-import TextInput from '@/Shared/TextInput'
-import LoadingButton from '@/Shared/LoadingButton'
-
-export default {
-    components: {
-        Head,
-        LoadingButton,
-        Logo,
-        TextInput,
-    },
-    data() {
-        return {
-            form: this.$inertia.form({
-                email: 'johndoe@example.com',
-                password: 'secret',
-                remember: false,
-            }),
-        }
-    },
-    methods: {
-        login() {
-            this.form.post('/login')
-        },
-    },
-}
-</script> -->

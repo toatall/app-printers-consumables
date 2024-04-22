@@ -21,11 +21,12 @@ class CreateTablesRoles extends Migration
 
         Schema::create('roles_users', function(Blueprint $table) {
             $table->integer('id_role')->index();
-            $table->integer('id_user')->index();
+            $table->integer('id_user')->index();            
             $table->timestamps();
 
             $table->primary(['id_role', 'id_user']);
         });
+        
     }
 
     /**
@@ -34,7 +35,7 @@ class CreateTablesRoles extends Migration
      * @return void
      */
     public function down()
-    {
+    {        
         Schema::dropIfExists('roles_users');
         Schema::dropIfExists('roles');
     }

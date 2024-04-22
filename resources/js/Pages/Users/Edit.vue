@@ -7,15 +7,17 @@ import Panel from 'primevue/panel'
 import FileUpload from 'primevue/fileupload'
 import { Inertia } from '@inertiajs/inertia'
 import Checkbox from 'primevue/checkbox'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import Menu from 'primevue/menu'
 import ProgressSpinner from 'primevue/progressspinner'
+import LoadingButton from '@/Shared/LoadingButton'
 
 const props = defineProps({
     user: Object,
-    roles: Array,
+    roles: Object,
+    organizations: Object,
     canGlobal: Object,
-    rolesLabels: Object,
+    rolesLabels: Object,    
 })
 
 defineOptions({
@@ -24,6 +26,7 @@ defineOptions({
 
 const user = props.user
 const userRoles = Array.from(Object.values(props.user.roles), (key) => key.name)
+const userOrganizations = Array.from(Object.values(props.user.organizations), (key) => key.code)
 const menu = ref(null)
 const menuItems = ref([
     { label: 'Удалить', icon: 'pi pi-times', visible: user.deleted_at === null, command: () => destroy() },
@@ -40,7 +43,7 @@ const form = useForm({
     password: '',
     photo: null,
     selectedRoles: userRoles,
-    
+    selectedOrganizations: userOrganizations,    
 })
 
 
@@ -73,13 +76,9 @@ const uploadFile = async(event) => {
     update()    
 }
 
-watch(
-    () => form.selectedRoles,
-    () => {
-        update()
-    }
-)
-
+const isAdmin = computed(() => {    
+    return form.selectedRoles.indexOf('admin') >= 0
+})
 </script>
 <template>    
 
@@ -173,26 +172,55 @@ watch(
                     <div>{{ user.lotus_mail }}</div>
                 </div>
 
-                <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Роли</div>
-                    <div>
-                        <div v-if="canGlobal.admin">                           
-                            <ProgressSpinner v-if="form.processing"></ProgressSpinner>
-                            <div v-else v-for="role in roles" :key="role.name" class="flex items-center mt-2">
-                                <Checkbox v-model="form.selectedRoles" :inputId="role.name" name="roles" :value="role.name" />
-                                <label :for="role.name" class="ml-2 cursor-pointer">
-                                    {{ props.rolesLabels[role.name] ?? role.name }}
-                                </label>
+                <ProgressSpinner v-if="form.processing"></ProgressSpinner>
+                <template v-else>
+                    <div class="flex mb-6">
+                        <div class="w-1/3 text-gray-500 font-semibold">Роли</div>
+                        <div>
+                            <div v-if="canGlobal.admin">                                                       
+                                <div v-for="role in roles" :key="role.name" class="flex items-center mt-2">
+                                    <template v-if="!(isAdmin && role.name != 'admin')">
+                                        <Checkbox v-model="form.selectedRoles" :inputId="role.name" name="roles" :value="role.name" />
+                                        <label :for="role.name" class="ml-2 cursor-pointer">
+                                            {{ props.rolesLabels[role.name] ?? role.name }}
+                                        </label>
+                                </template>
+                                </div>                            
+                            </div>
+                            <div v-else>
+                                <ul>
+                                    <li v-for="role in user.roles" class="mt-2">
+                                        {{ props.rolesLabels[role.name] ?? role.name }}
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        <div v-else>
-                            <ul>
-                                <li v-for="role in user.roles" class="mt-2">
-                                    {{ props.rolesLabels[role.name] ?? role.name }}
-                                </li>
-                            </ul>
+                    </div>
+
+                    <div class="flex mb-6" v-if="!isAdmin">
+                        <div class="w-1/3 text-gray-500 font-semibold">Контекст</div>
+                        <div>
+                            <div v-if="canGlobal.admin">                            
+                                <div v-for="organization in organizations" :key="organization.code" class="flex items-center mt-2">
+                                    <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
+                                    <label :for="organization.code" class="ml-2 cursor-pointer">
+                                        {{ `${organization.name} (${organization.code})` }}
+                                    </label>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <ul>
+                                    <li v-for="organization in organizations" class="mt-2">
+                                        {{ organization.name }}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
+                </template>
+
+                <div class="flex mb-6" v-if="form.isDirty">
+                    <loading-button :loading="form.processing" class="font-bold" type="button" @click="update">Сохранить</loading-button>
                 </div>
 
             </div>            

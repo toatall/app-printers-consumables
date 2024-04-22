@@ -1,109 +1,101 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3'
+import { Head } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
-import Consumable from '@/Pages/Consumable/Index'
-import { computed, reactive } from 'vue'
+import { inject } from 'vue'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
 import Button from 'primevue/button'
-import LoadingButton from '@/Shared/LoadingButton'
 import { Inertia } from '@inertiajs/inertia'
-import TableTitle from '@/Shared/TableTitle'
-import { DateHelper } from '@/Helpers/DateHelper'
+import Card from 'primevue/card';
+import { useConfirm } from "primevue/useconfirm"
+import DetailViewer from '@/Shared/DetailViewer'
 
 defineOptions({
     layout: Layout
 })
-
+const urls = inject('urls')
+const confirm = useConfirm()
 const props = defineProps({
-    printer: Object,
-    labelsPrinter: Object,
-    labelsConsumable: Object,
-    consumables: Array,
-    typesConsumables: Object,
-    cartridgeColors: Object,
+    printerWorkplace: Object,
+    printerLabels: Object,
+    printerWorkplaceLabels: Object,    
     canGlobal: Object,
 })
-const printer = reactive(props.printer)
-const typesConsumables = reactive(props.typesConsumables)
 
-const printerFullName = computed({
-    get() { 
-        return props.printer.vendor + ' ' + props.printer.model
-    }
-})
+const printer = props.printerWorkplace.printer
+const printerWorkplace = props.printerWorkplace
+const printerLabels = props.printerLabels
 
-const editPrinter = () => {
-    Inertia.get(`/printers/${printer.id}/edit`)
+const actions = {
+    edit: () => Inertia.get(urls.printers.edit(printerWorkplace.id)),
+    delete: () => confirm.require({
+        message: 'Вы уверены, что хотите удалить?',
+        header: 'Удаление',
+        accept: () => Inertia.delete(urls.printers.delete(printerWorkplace.id)),
+    }),
 }
-const destroyPrinter = () => {
-    if (confirm('Вы уверены, что хотите удалить принтер?')) {
-        Inertia.delete(`/printers/${printer.id}`)
-    }    
-}
-
+const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})`
 </script>
 
 <template>
     <div>
-        <Head :title="printerFullName" />        
+        <Head :title="title" />        
 
-        <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-            { label: 'Принтеры и расходные материалы', url: '/printers' },
-            { label: printerFullName },
+        <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
+            { label: 'Принтеры', url: urls.printers.index() },
+            { label: title },
         ]" />
 
-        <div class="rounded-lg bg-white shadow-sm border border-gray-200">                           
-            <div class="relative m-4 overflow-x-auto shadow-md sm:rounded-lg w-1/2">
-                <TableTitle>Описание принтера</TableTitle>         
-                <table class="text-gray-700 w-full mt-2">
-                    <tr class="border-b border-gray-200">
-                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">{{ labelsPrinter.vendor }}</td>
-                        <td scope="row" class="px-6 py-4">{{ printer.vendor }}</td>
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">{{ labelsPrinter.model }}</td>
-                        <td scope="row" class="px-6 py-4">{{ printer.model }}</td>                        
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">{{ labelsPrinter.color_print }}</td>
-                        <td scope="row" class="px-6 py-4">{{ printer.color_print ? 'Да' : 'Нет' }}</td>                        
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">{{ labelsPrinter.created_at }}</td>
-                        <td scope="row" class="px-6 py-4">                            
-                            <span v-tooltip="DateHelper.formatLong(printer.created_at)">
-                                {{ DateHelper.relative(printer.created_at) }}
-                            </span>
-                        </td>                        
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">{{ labelsPrinter.updated_at }}</td>
-                        <td scope="row" class="px-6 py-4">
-                            <span v-tooltip="DateHelper.formatLong(printer.updated_at)">
-                                {{ DateHelper.relative(printer.updated_at) }}
-                            </span>
-                        </td>                        
-                    </tr>
-                </table>
-            </div>
-            <div v-if="canGlobal.editorStock" class="flex items-center justify-between p-8 py-4 bg-gray-50 border-t border-gray-100 w-full">
-                <Button class="font-bold" @click="editPrinter">
-                    Редактировать
-                </Button>                
-                <LoadingButton class="font-bold" severity="danger" @click="destroyPrinter">Удалить</LoadingButton>                
-            </div>
-        </div>
+        <Card>
+            <template #title> {{ title }} </template>
+            <template #content>
+                <DetailViewer :items="[
+                    { 
+                        label: printerLabels.vendor, 
+                        value: printer.vendor 
+                    },
+                    { 
+                        label: printerLabels.model, 
+                        value: printer.model },
+                    { 
+                        label: printerLabels.is_color_print, 
+                        value: printer.is_color_print ? 'Да': 'Нет',
+                    },
+                    { 
+                        label: printerWorkplaceLabels.location, 
+                        value: printerWorkplace.location,
+                    },
+                    { 
+                        label: printerWorkplaceLabels.serial_number, 
+                        value: printerWorkplace.serial_number,
+                    },
+                    { 
+                        label: printerWorkplaceLabels.inventory_number, 
+                        value: printerWorkplace.inventory_number,
+                    },
+                    { 
+                        label: printerWorkplaceLabels.author, 
+                        value: printerWorkplace.author.fio ?? printerWorkplace.author.name,
+                    },
+                    { 
+                        label: printerWorkplaceLabels.created_at, 
+                        value: printerWorkplace.created_at,
+                        is_date: true,
+                        icon: 'far fa-calendar',
+                    },
+                    { 
+                        label: printerWorkplaceLabels.updated_at, 
+                        value: printerWorkplace.updated_at,
+                        is_date: true,
+                        icon: 'far fa-calendar-alt',                        
+                    },
+                ]"></DetailViewer>                
 
-        <div class="flex justify-stretch bg-white rounded-md shadow overflow-hidden mt-4">
-            <consumable 
-                :consumables="consumables" 
-                :labelsConsumable="labelsConsumable" 
-                :printer="printer" 
-                :typesConsumables="typesConsumables" 
-                :cartridgeColors="cartridgeColors"
-                :canGlobal="canGlobal"
-            />
-        </div>
+                <div class="flex justify-between mt-10 font-bold">
+                    <Button @click="actions.edit">Редактировать</Button>
+                    <Button severity="danger" @click="actions.delete">Удалить</Button>             
+                </div>
+            </template>
+        </Card>
         
     </div>
 

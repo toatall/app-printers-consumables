@@ -1,39 +1,38 @@
 <script setup>
 import { Head } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
-import { ref, computed, reactive } from 'vue'
+import { inject } from 'vue'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
 import Form from './Form'
 
 defineOptions({
     layout: Layout
 })
-
+const urls = inject('urls')
 const props = defineProps({
-    printer: Object,
     labels: Object,
-    consumables: Array,
+    printers: Object,
+    printerWorkplace: Object,
 })
-const labels = ref(props.labels)
-const printer = reactive(props.printer)
-const title = computed({
-    get() { 
-        return props.printer.vendor + ' ' + props.printer.model
-    }
-})
+const title = 'Редактирование'
 
 </script>
 <template>
     
     <Head :title="title" />        
 
-    <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-        { label: 'Принтеры и расходные материалы', url: '/printers' },
-        { label: title, url: `/printers/${printer.id}/show` },
-        { label: 'Редактирование' },
+    <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
+        { label: 'Принтеры', url: urls.printers.index() },
+        { label: `${printerWorkplace.printer.vendor} ${printerWorkplace.printer.model} (${printerWorkplace.location})`, url: urls.printers.show(printerWorkplace.id) },
+        { label: title },
     ]" />
 
-    <Form :isNew="false" :labels="labels" :printer="printer"></Form>        
+    <Form 
+        :isNew="false" 
+        :labels="labels" 
+        :printers="printers" 
+        :printerWorkplace="printerWorkplace"
+    ></Form>        
     
 </template>
 

@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use App\Models\LdapFinder;
-use App\Models\Role;
-use App\Models\User;
-use App\Models\UserFactory;
+use App\Models\Auth\LdapFinder;
+use App\Models\Auth\Permission;
+use App\Models\Auth\Role;
+use App\Models\Auth\User;
+use App\Models\Auth\UserChecker;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UsersController extends Controller
@@ -26,6 +27,21 @@ class UsersController extends Controller
     {
         return Role::all()->transform(fn(Role $role) => [
             'name' => $role->name,
+        ]);
+    }
+
+    // private function permissions()
+    // {
+    //     return Permission::all()->transform(fn(Permission $permission) => [
+    //         'name' => $permission->name,
+    //     ]);
+    // }
+
+    private function organizations()
+    {
+        return Organization::all()->transform(fn(Organization $organization) => [
+            'code' => $organization->code,
+            'name' => $organization->name,
         ]);
     }
 
@@ -45,30 +61,20 @@ class UsersController extends Controller
             'lotus_mail' => $user->lotus_mail,
             'photo' => $user->photo_path ? URL::route('image', ['path' => $user->photo_path, 'w' => 40, 'h' => 40, 'fit' => 'crop']) : null,
             'roles' => $user->roles,
+            'permissions' => $user->permissions,
             'deleted_at' => $user->deleted_at,
         ];
-    }
-
-    /**
-     * @return User
-     */
-    protected function getAuthUser(): User
-    {
-        return Auth::user();
-    }
+    }   
 
     
     public function index()
-    {
+    {        
         return Inertia::render('Users/Index', [
             'filters' => Request::all(['search', 'role']),
             'users' => User::filter(Request::only(['search', 'role']))                
                 ->get()
                 ->transform($this->transformUser()),
             'roles' => $this->roles(),
-            // 'can' => [
-            //     'add' => Auth::user()->hasRole('admin'),
-            // ],
             'rolesLabels' => User::rolesLabels(),           
         ]);
     }
@@ -81,7 +87,7 @@ class UsersController extends Controller
 
     public function store(UserRequest $request)
     {
-        $userFactory = new UserFactory(new LdapFinder(
+        $userFactory = new UserChecker(new LdapFinder(
             host: env('LDAP_SERVER_NAME'),
             port: env('LDAP_SERVER_PORT'),
             dn: env('LDAP_BASE_DN'),
@@ -113,7 +119,8 @@ class UsersController extends Controller
                 'deleted_at' => $user->deleted_at,
                 'roles' => $user->roles()->get()->transform(fn(Role $role) => [
                     'name' => $role->name,
-                ]),
+                ]),                
+                'organizations' => $user->organizations,
                 'fio' => $user->fio,
                 'domain' => $user->domain,
                 'org_code' => $user->org_code,
@@ -123,7 +130,8 @@ class UsersController extends Controller
                 'telephone' => $user->telephone,
                 'lotus_mail' => $user->lotus_mail,
             ],
-            'roles' => $this->roles(), 
+            'roles' => $this->roles(),             
+            'organizations' => $this->organizations(),
             'rolesLabels' => User::rolesLabels(),           
         ]);
     }
@@ -138,8 +146,10 @@ class UsersController extends Controller
             $user->update(['photo_path' => Request::file('photo')->store('users')]);
         }
 
-        if ($this->getAuthUser()->hasRole('admin')) {
+        if (Auth::user()->hasRole('admin')) {
             $user->updateRoles(Request::get('selectedRoles'));
+            //$user->updatePermissions(Request::get('selectedPermissions'));
+            $user->updateOrganizations(Request::get('selectedOrganizations'));
         }
 
         return Redirect::back()->with('success', 'Данные пользователя обновлены.');

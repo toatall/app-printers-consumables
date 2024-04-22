@@ -29,7 +29,7 @@ class Authenticate extends Middleware
             Auth::login($user, true);
         }
         else {
-            parent::handle($request, $next, $guards);
+            return parent::handle($request, $next, $guards);
         }    
         return $next($request);
     }

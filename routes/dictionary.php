@@ -1,0 +1,25 @@
+<?php
+
+use App\Http\Controllers\Dictionary\ConsumablesController;
+use App\Http\Controllers\Dictionary\ConsumablesPrintersController;
+use App\Http\Controllers\Dictionary\PrintersConsumablesController;
+use App\Http\Controllers\Dictionary\PrintersController;
+use App\Http\Controllers\Dictionary\OrganizationsController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('dictionary')->name('dictionary.')->middleware('role:admin')->group(function() {
+
+    // принтеры
+    Route::resource('printers', PrintersController::class);
+    Route::resource('printers.consumables', PrintersConsumablesController::class);
+    Route::post('/printers/{printer}/consumables/{consumable}/add', [PrintersConsumablesController::class, 'add']);
+
+    // Расходные материалы
+    Route::resource('consumables', ConsumablesController::class);
+    Route::resource('consumables.printers', ConsumablesPrintersController::class)->only(['index', 'destroy']);
+    Route::post('/consumables/{consumable}/printers/{printer}/add', [ConsumablesPrintersController::class, 'add']);
+
+    // Организации
+    Route::resource('organizations', OrganizationsController::class);
+
+});

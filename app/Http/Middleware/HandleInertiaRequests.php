@@ -2,7 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Role;
+use App;
+use App\Models\Auth\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
@@ -47,11 +48,12 @@ class HandleInertiaRequests extends Middleware
                         'email' => $request->user()->email,
                         'roles' => $request->user()->roles()->get()->transform(fn(Role $role) => [
                             'name' => $role->name,
-                        ]),    
-                        'fio' => $request->user()->fio,                 
-                    ] : null,                    
+                        ]),
+                        'fio' => $request->user()->fio,
+                        'org_code' => $request->user()->org_code,
+                    ] : null,
                 ];
-            },
+            },            
             'canGlobal' => [
                 'admin' => Auth::check() && Auth::user()->hasRole('admin'),
                 'editorStock' => Auth::check() && Auth::user()->hasRole(['admin', 'editor-stock']),
@@ -64,6 +66,7 @@ class HandleInertiaRequests extends Middleware
                     'error' => $request->session()->get('error'),
                 ];
             },
+            'appName' => config('app.name'),
             
         ]);
     }

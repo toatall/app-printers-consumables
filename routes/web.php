@@ -3,10 +3,13 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConsumablesController;
+use App\Http\Controllers\ConsumablesCountsController;
 use App\Http\Controllers\ConsumablesMoveController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\PrintersController;
+use App\Http\Controllers\PrintersWorkplaceController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\UsersOrganizationsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,68 +73,94 @@ Route::put('users/{user}/restore', [UsersController::class, 'restore'])
     ->name('users.restore')
     ->middleware('role:admin');
 
+Route::get('users/organizations', [UsersOrganizationsController::class, 'index'])
+    ->name('users.organizations')
+    ->middleware('auth');
+Route::post('users/organizations/{organization}', [UsersOrganizationsController::class, 'change'])
+    ->middleware('auth');
 
-// Printers
 
-Route::get('printers', [PrintersController::class, 'index'])
-    ->name('printers')
-    ->middleware('role:admin,editor-stock,editor-local');
+Route::middleware('auth')->group(function() {
+    // Printers
+    Route::resource('printers/workplace', PrintersWorkplaceController::class);
 
-Route::get('printers/create', [PrintersController::class, 'create'])
-    ->name('printers.create')
-    ->middleware('role:editor-stock,admin');
+    // ConsumableCount
+    Route::get('consumables/counts', [ConsumablesCountsController::class, 'index'])->name('consumables.counts');
+    Route::get('consumables/counts/create', [ConsumablesCountsController::class, 'create']);
+    Route::post('consumables/counts/save', [ConsumablesCountsController::class, 'save']);
+    Route::get('consumables/counts/{consumableCount}', [ConsumablesCountsController::class, 'show']);
+    Route::post('consumables/counts/validate/{step}', [ConsumablesCountsController::class, 'validateConsumableCount']);
+    Route::post('consumables/counts/check-exists', [ConsumablesCountsController::class, 'checkExists']);
+});
 
-Route::post('printers', [PrintersController::class, 'store'])
-    ->name('printers.store')
-    ->middleware('role:editor-stock,admin');
 
-Route::get('printers/{printer}/show', [PrintersController::class, 'show'])
-    ->name('printers.show')
-    ->middleware('role:admin,editor-stock,editor-local');
 
-Route::get('printers/{printer}/edit', [PrintersController::class, 'edit'])
-    ->name('printers.edit')
-    ->middleware('role:editor-stock,admin');
 
-Route::put('printers/{printer}', [PrintersController::class, 'update'])
-    ->name('printers.update')
-    ->middleware('role:editor-stock,admin');
 
-Route::delete('printers/{printer}', [PrintersController::class, 'destroy'])
-    ->name('printers.destroy')
-    ->middleware('role:editor-stock,admin');
+// Route::get('printers', [PrintersController::class, 'index'])
+//     ->name('printers')
+//     ->middleware('role:admin,editor-stock,editor-local');
 
-Route::put('printers/{printer}/restore', [PrintersController::class, 'restore'])
-    ->name('printers.restore')
-    ->middleware('role:editor-stock,admin');
+// Route::get('printers/create', [PrintersController::class, 'create'])
+//     ->name('printers.create')
+//     ->middleware('role:editor-stock,admin');
+
+// Route::post('printers', [PrintersController::class, 'store'])
+//     ->name('printers.store')
+//     ->middleware('role:editor-stock,admin');
+
+// Route::get('printers/{printer}/show', [PrintersController::class, 'show'])
+//     ->name('printers.show')
+//     ->middleware('role:admin,editor-stock,editor-local');
+
+// Route::get('printers/{printer}/edit', [PrintersController::class, 'edit'])
+//     ->name('printers.edit')
+//     ->middleware('role:editor-stock,admin');
+
+// Route::put('printers/{printer}', [PrintersController::class, 'update'])
+//     ->name('printers.update')
+//     ->middleware('role:editor-stock,admin');
+
+// Route::delete('printers/{printer}', [PrintersController::class, 'destroy'])
+//     ->name('printers.destroy')
+//     ->middleware('role:editor-stock,admin');
+
+// Route::put('printers/{printer}/restore', [PrintersController::class, 'restore'])
+//     ->name('printers.restore')
+//     ->middleware('role:editor-stock,admin');
     
 // Consumable
 
-Route::resource('printers.consumables', ConsumablesController::class)    
-    ->middleware('role:editor-stock,admin');
+// Route::resource('printers.consumables', ConsumablesController::class)    
+//     ->middleware('role:editor-stock,admin');
 
 // Consumable move
 
-Route::get('/consumable-moves', [ConsumablesMoveController::class, 'index'])
-    ->middleware('role:reader,editor-stock,editor-local,admin');
-Route::post('printers/{printer}/consumables-move/{consumable}/add', [ConsumablesMoveController::class, 'add'])
-    ->middleware('role:editor-stock,admin');
-Route::post('printers/{printer}/consumables-move/{consumable}/take', [ConsumablesMoveController::class, 'takeLocal'])
-    ->middleware('role:editor-local,editor-stock,admin');
-Route::post('printers/{printer}/consumables-move/{consumable}/move-to-local', [ConsumablesMoveController::class, 'moveToLocal'])
-    ->middleware('role:editor-stock,admin');
-Route::get('printers/{printer}/consumables-move/{consumable}/history', [ConsumablesMoveController::class, 'history'])
-    ->middleware('role:reader,editor-local,editor-stock,admin');
-Route::delete('consumable-move/{id}/history', [ConsumablesMoveController::class, 'removeHistory'])
-    ->middleware('role:admin');
+// Route::get('/consumable-moves', [ConsumablesMoveController::class, 'index'])
+//     // ->middleware('role:reader,editor-stock,editor-local,admin');
+//     ->middleware('auth');
+// Route::post('printers/{printer}/consumables-move/{consumable}/add', [ConsumablesMoveController::class, 'add'])
+//     ->middleware('role:editor-stock,admin');
+// Route::post('printers/{printer}/consumables-move/{consumable}/take', [ConsumablesMoveController::class, 'takeLocal'])
+//     ->middleware('role:editor-local,editor-stock,admin');
+// Route::post('printers/{printer}/consumables-move/{consumable}/move-to-local', [ConsumablesMoveController::class, 'moveToLocal'])
+//     ->middleware('role:editor-stock,admin');
+// Route::get('printers/{printer}/consumables-move/{consumable}/history', [ConsumablesMoveController::class, 'history'])
+//     ->middleware('role:reader,editor-local,editor-stock,admin');
+// Route::delete('consumable-move/{id}/history', [ConsumablesMoveController::class, 'removeHistory'])
+//     ->middleware('role:admin');
 
 // Chart
 
-Route::get('chart', [ChartController::class, 'index'])
-    ->middleware('role:reader,editor-stock,editor-local,admin');
+// Route::get('chart', [ChartController::class, 'index'])
+//     //->middleware('role:reader,editor-stock,editor-local,admin');
+//     ->middleware('auth');
 
 // Images
 
 Route::get('/img/{path}', [ImagesController::class, 'show'])
     ->where('path', '.*')
     ->name('image');
+
+
+require_once __DIR__ . "/dictionary.php";

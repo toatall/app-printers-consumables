@@ -8,7 +8,7 @@ import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import { Inertia } from '@inertiajs/inertia'
 import LoadingButton from '@/Shared/LoadingButton'
-import { ConfigUrl } from '@/configUrl'
+// import { ConfigUrl } from '@/config'
 
 
 const dialogRef = inject('dialogRef')

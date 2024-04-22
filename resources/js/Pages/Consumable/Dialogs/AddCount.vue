@@ -8,7 +8,7 @@ import Textarea from 'primevue/textarea'
 import { Inertia } from '@inertiajs/inertia'
 import { ref, inject, onMounted } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
-import { ConfigUrl } from '@/configUrl'
+// import { ConfigUrl } from '@/config'
 
 const dialogRef = inject('dialogRef')
 const labelsConsumable = ref()

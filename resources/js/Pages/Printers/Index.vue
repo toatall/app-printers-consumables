@@ -1,7 +1,7 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3'
+import { Head } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
-import { onMounted, watch, reactive, ref } from 'vue'
+import { onMounted, watch, reactive, ref, inject } from 'vue'
 import { initFlowbite } from 'flowbite'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
 import DataTable from 'primevue/datatable'
@@ -14,26 +14,24 @@ import pickBy from 'lodash/pickBy'
 import throttle from 'lodash/throttle'
 
 const props = defineProps({
-    printers: Array,
-    labels: Object,
-    filters: Object,
-    typesConsumables: Object,
-    cartridgeColors: Object,
+    printersWorkplace: Array,
+    printerLabels: Object,
+    printerWorkplaceLabels: Object,
+    filters: Object,    
     canGlobal: Object,
 })
 
 defineOptions({
     layout: Layout
 })
+const urls = inject('urls')
+const moment = inject('moment')
 
 onMounted(() => {
     initFlowbite()
 })
 
-const manageMenu = ref()
 const selectedRow = ref()
-const typesConsumables = reactive(props.typesConsumables)
-const cartridgeColors = reactive(props.cartridgeColors)
 const filters = reactive(props.filters)
 const form = reactive({
     search: filters.search,
@@ -42,52 +40,40 @@ const form = reactive({
 watch(
     () => form,
     throttle(() => {
-        Inertia.get('/printers', pickBy(form), { preserveState: true })
+        Inertia.get(urls.printers.index(), pickBy(form), { preserveState: true })
     }, 150),
     { deep: true }
 )
 
-const helper = {
-    getTypeConsumableLabel(key) {
-        return typesConsumables[key] ?? key
-    },
-    getColor(key) {
-        return cartridgeColors[key]
-    }
+
+const title = 'Принтеры'
+
+const actions = {
+    create: () => Inertia.get(urls.printers.create()),
+    show: (event) => Inertia.get(urls.printers.show(event.data.id)),
 }
-
-
-
-const routeGet = (url) => {
-    Inertia.get(url)
-}
-
-const onRowSelect = (event) => {
-    routeGet(`printers/${event.data.id}/show`)
-}
-
 </script>
 <template>
     
-    <Head title="Принтеры и расходные материалы" />    
+    <Head :title="title" />    
 
     <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-        { label: 'Принтеры и расходные материалы' },
+        { label: title },
     ]" />
 
     <div class="flex justify-stretch bg-white rounded-md shadow overflow-hidden mt-4">
-        <DataTable :value="printers"
+        <DataTable :value="printersWorkplace"
             paginator :rows="10" v-model:selection="selectedRow"
             dataKey="id" :metaKeySelection="false"
             class="w-full" tableStyle="min-width: 50rem" selectionMode="single"
-            @rowSelect="onRowSelect"
+            @rowSelect="actions.show"
         >
             <template #header>
-                <TableTitle class="border-b border-gray-200 pb-2">Принтеры и расходные материалы</TableTitle>
+                <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="`/printers/create`" v-if="canGlobal.editorStock">
-                        <Button type="button" outlined>Добавить принтер</Button>
-                    </Link>
+                    <Button @click="actions.create" v-if="canGlobal.editorStock" severity="info">
+                        Добавить принтер
+                    </Button>                    
                     <div v-else></div>                    
                     <span class="relative">
                         <i class="fas fa-search absolute top-2/4 -mt-2 left-3 text-surface-400"></i>
@@ -100,11 +86,11 @@ const onRowSelect = (event) => {
                     {{ slotProps.index + 1 }}
                 </template>
             </Column>
-            <Column field="full_name" header="Принтер" style="min-width: 200px">
-                <template #body="slotProps">
+            <Column field="printer.vendor" :header="printerWorkplaceLabels.id_printer" sortable>
+                <template #body="{ data }">
                     <div class="flex align-items-center gap-2">                       
-                        <span>{{ slotProps.data.full_name }}</span>         
-                        <div v-if="slotProps.data.color_print" v-tooltip="'Цветная печать'">        
+                        <span>{{ `${data.printer.vendor} ${data.printer.model}` }}</span>         
+                        <div v-if="data.printer.is_color_print" v-tooltip="'Цветная печать'">        
                             <svg                                 
                                 version="1.1" xmlns="http://www.w3.org/2000/svg" 
                                 xmlns:xlink="http://www.w3.org/1999/xlink" 
@@ -126,28 +112,23 @@ const onRowSelect = (event) => {
                     </div>
                 </template>
             </Column>        
-            <Column header="Расходные материалы">
-                <template #body="slotProps">                    
-                    <div v-for="(item, index) in slotProps.data.consumables" :key="index" class="col-12">
-                        <div class="flex flex-column sm:flex-row sm:align-items-center gap-3" :class="{ 'border-top-1 surface-border': index !== 0 }">
-                            <div class="flex mb-2">
-                                <div>
-                                    {{ helper.getTypeConsumableLabel(item.type_consumable) }}
-                                </div>
-                                <div class="ml-2">
-                                    {{ item.name }}
-                                </div>
-                                <div class="ml-2" v-if="item.type_consumable == 'cartridge'">
-                                    <div                                        
-                                        :class="`ml-2 rounded-full h-4 w-4 ${helper.getColor(item.color).color}`"
-                                        v-tooltip="`${helper.getColor(item.color).name}`"
-                                    ></div>
-                                </div>                               
-                            </div>
-                        </div>                                    
+            <Column field="location" :header="printerWorkplaceLabels.location" sortable />
+            <Column field="serial_number" :header="printerWorkplaceLabels.serial_number" sortable />
+            <Column field="inventory_number" :header="printerWorkplaceLabels.inventory_number" sortable />
+            <Column field="created_at" :header="printerWorkplaceLabels.date" sortable>
+                <template #body="{ data }">       
+                    <div class="grid grid-rows-2 gap-2">
+                        <div v-tooltip="`Создано: ${moment(data.created_at).format('LLLL')}`">
+                            <i class="far fa-calendar"></i>
+                            {{ moment(data.created_at).fromNow() }}
+                        </div>                    
+                        <div v-if="data.created_at != data.updated_at" v-tooltip="`Изменено: ${moment(data.updated_at).format('LLLL')}`">
+                            <i class="far fa-calendar-alt"></i>      
+                            {{ moment(data.updated_at).fromNow() }}
+                        </div>
                     </div>
                 </template>
-            </Column>            
+            </Column>
             
             <template #empty> Нет данных </template>
 
