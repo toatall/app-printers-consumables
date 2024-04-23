@@ -15,7 +15,7 @@ class ConsumableCountRequestValidate extends ConsumableCountRequest
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
-    {
+    {        
         $step = $this->input('step');
         if ($step !== null) {
             $this->step = (int) $step;

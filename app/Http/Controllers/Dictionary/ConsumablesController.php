@@ -11,10 +11,14 @@ use App\Models\Printer\Printer;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
+/**
+ * Управление справочником расходных материалов
+ */
 class ConsumablesController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Список расходных материалов
+     * @return \Inertia\Response
      */
     public function index()
     {        
@@ -28,7 +32,8 @@ class ConsumablesController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Создание расходного материала
+     * @return \Inertia\Response
      */
     public function create()
     {
@@ -40,7 +45,9 @@ class ConsumablesController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Сохранение нового расходного материала
+     * @param ConsumableRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(ConsumableRequest $request)
     {
@@ -52,6 +59,11 @@ class ConsumablesController extends Controller
             ->with('success', 'Запись успешно добавлена!');
     }
 
+    /**
+     * Подробные сведения о расходном материале
+     * @param Consumable $consumable расходный материал
+     * @return \Inertia\Response
+     */
     public function show(Consumable $consumable)
     {
         return Inertia::render('Dictionary/Consumables/Show', [            
@@ -76,7 +88,9 @@ class ConsumablesController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Редактирование расходного материала
+     * @param Consumable $consumable расходный материал
+     * @return \Inertia\Response
      */
     public function edit(Consumable $consumable)
     {
@@ -90,7 +104,10 @@ class ConsumablesController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Сохранение измененного расходного материала
+     * @param ConsumableRequest $request
+     * @param Consumable $consumable расходный материал
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ConsumableRequest $request, Consumable $consumable)
     {
@@ -103,7 +120,9 @@ class ConsumablesController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удаление расходного материала
+     * @param Consumable $consumable расходный материал
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Consumable $consumable)
     {
@@ -111,4 +130,5 @@ class ConsumablesController extends Controller
         return redirect()->route('dictionary.consumables.index')
             ->with('success', 'Запись успешно удалена!');
     }
+    
 }

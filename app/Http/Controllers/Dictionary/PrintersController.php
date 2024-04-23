@@ -11,10 +11,14 @@ use App\Models\Printer\Printer;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
+/**
+ * Управление справочником принтеров
+ */
 class PrintersController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Список принтеров
+     * @return \Inertia\Response
      */
     public function index()
     {
@@ -25,7 +29,8 @@ class PrintersController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Добавление принтера
+     * @return \Inertia\Response
      */
     public function create()
     {
@@ -35,7 +40,9 @@ class PrintersController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Сохранение нового принтера
+     * @param PrinterRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(PrinterRequest $request)
     {
@@ -47,6 +54,11 @@ class PrintersController extends Controller
             ->with('success', 'Запись успешно добавлена!');
     }    
 
+    /**
+     * Детальная информация о принтере $printer 
+     * @param Printer $printer
+     * @return \Inertia\Response
+     */
     public function show(Printer $printer)
     {
         return Inertia::render('Dictionary/Printers/Show', [            
@@ -70,7 +82,9 @@ class PrintersController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Редактирование принтера $printer
+     * @param Printer $printer
+     * @return \Inertia\Response
      */
     public function edit(Printer $printer)
     {
@@ -81,7 +95,10 @@ class PrintersController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Сохранение отредактированного принтера $printer
+     * @param Printer $printer
+     * @param PrinterRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(PrinterRequest $request, Printer $printer)
     {       
@@ -94,7 +111,9 @@ class PrintersController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удаление принтера $printer 
+     * @param Printer $printer
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Printer $printer)
     {

@@ -37,15 +37,18 @@ export const urls = {
             validate: (id) => `/consumables/counts/validate`,
             checkExists: () => `/consumables/counts/check-exists`,
             update(id) { return this.show(id) },
+            updateOrganizations(id) { return `${this.base}/${id}/update-organizations` },
 
             journal: {
                 added: {
                     index: (idConsumable, idConsumableCount) => `/consumables/${idConsumable}/counts/${idConsumableCount}/added`,
                     redo: (idConsumable, idConsumableCount, id) => `/consumables/${idConsumable}/counts/${idConsumableCount}/added/${id}`,
                 },
-            },
-            journalAdded: (id) => `/consumables/counts/${id}/journal-added`,
-            journalInstalled: (id) => `/consumables/counts/${id}/journal-installed`,
+                installed: {
+                    index: (idConsumable, idConsumableCount) => `/consumables/${idConsumable}/counts/${idConsumableCount}/installed`,
+                    redo: (idConsumable, idConsumableCount, id) => `/consumables/${idConsumable}/counts/${idConsumableCount}/installed/${id}`,
+                },
+            },            
         },
     },    
     

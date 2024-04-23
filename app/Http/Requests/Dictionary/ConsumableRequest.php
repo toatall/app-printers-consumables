@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\RequiredIf;
 
+/**
+ * Расходный материал
+ */
 class ConsumableRequest extends FormRequest
 {
     private $_consumable;
@@ -46,6 +49,9 @@ class ConsumableRequest extends FormRequest
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function attributes()
     {
         return Consumable::labels();

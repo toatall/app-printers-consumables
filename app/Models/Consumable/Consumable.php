@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
+ * Расходный материал
+ * 
  * @property int $id
  * @property int $id_author
  * @property string $type
@@ -30,6 +32,9 @@ class Consumable extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * {@inheritDoc}
+     */
     public static function boot()
     {
         parent::boot();
@@ -56,22 +61,16 @@ class Consumable extends Model
 
 
     /**
+     * Автор записи
      * @return HasOne
      */
     public function author(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'id_author');
-    }
+    }    
 
     /**
-     * @return HasMany
-     */
-    // public function consumablesCounts(): HasMany
-    // {
-    //     return $this->hasMany(ConsumableCount::class, 'id_consumable', 'id');
-    // }
-
-    /**
+     * Принтеры привязанные к этому расходному материалу
      * @return BelongsToMany
      */
     public function printers(): BelongsToMany
@@ -79,6 +78,10 @@ class Consumable extends Model
         return $this->belongsToMany(Printer::class, 'printers_consumables', 'id_consumable', 'id_printer');        
     }
 
+    /**
+     * Принтеры не привязанные к этому расходному материалу
+     * @return Builder
+     */
     public function printersNotIn()
     {        
         return Printer::whereDoesntHave('consumables', fn(Builder $query) => 
@@ -87,6 +90,7 @@ class Consumable extends Model
     }
 
     /**
+     * Фильтр
      * @param Builder $query
      * @param array $filter
      */
@@ -100,6 +104,7 @@ class Consumable extends Model
     }
 
     /**
+     * Описание атрибутов
      * @return array
      */
     public static function labels()
@@ -116,6 +121,10 @@ class Consumable extends Model
         ];
     }
 
+    /**
+     * Описание расходного материала (с указанием типа, наименование и цветом (если картридж))
+     * @return string
+     */
     public function title()
     {
         $title = ConsumableTypesEnum::getValueByName($this->type) . ' ' . $this->name;

@@ -4,24 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\Auth\LdapFinder;
-use App\Models\Auth\Permission;
 use App\Models\Auth\Role;
 use App\Models\Auth\User;
 use App\Models\Auth\UserChecker;
 use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
+/**
+ * Управление пользователями
+ */
 class UsersController extends Controller
 {
 
     /**
-     * Доступные роли
-     * @return mixed
+     * Все доступные роли
+     * @return \Illuminate\Support\Collection
      */
     private function roles(): mixed
     {
@@ -30,13 +31,10 @@ class UsersController extends Controller
         ]);
     }
 
-    // private function permissions()
-    // {
-    //     return Permission::all()->transform(fn(Permission $permission) => [
-    //         'name' => $permission->name,
-    //     ]);
-    // }
-
+    /**
+     * Все организации
+     * @return \Illuminate\Support\Collection
+     */
     private function organizations()
     {
         return Organization::all()->transform(fn(Organization $organization) => [
@@ -66,7 +64,10 @@ class UsersController extends Controller
         ];
     }   
 
-    
+    /**
+     * Список пользователей
+     * @return \Inertia\Response
+     */
     public function index()
     {        
         return Inertia::render('Users/Index', [
@@ -79,12 +80,20 @@ class UsersController extends Controller
         ]);
     }
 
-
+    /**
+     * Создание пользователя
+     * @return \Inertia\Response
+     */
     public function create()
     {
         return Inertia::render('Users/Create');
     }
 
+    /**
+     * Сохранение нового пользователя
+     * @param UserRequest $request
+     * @return \Illuminate\Http\RedirectResponse|void
+     */
     public function store(UserRequest $request)
     {
         $userFactory = new UserChecker(new LdapFinder(
@@ -99,9 +108,15 @@ class UsersController extends Controller
         }
         $user = $userFactory->findOrCreate("$request->name");
 
-        return Redirect::route('users.edit', [$user])->with('success', 'Пользователь успешно создан!');
+        return redirect()->route('users.edit', [$user])
+            ->with('success', 'Пользователь успешно создан!');
     }
 
+    /**
+     * Редактирование пользователя @param User $user
+     * изменение данных пользователя, изменение прав доступа
+     * @return \Inertia\Response
+     */
     public function edit(User $user)
     {
         if (Auth::check() && !Auth::user()->hasRole('admin')) {
@@ -109,7 +124,6 @@ class UsersController extends Controller
                 abort(403);
             }
         }
-
         return Inertia::render('Users/Edit', [
             'user' => [
                 'id' => $user->id,
@@ -136,39 +150,48 @@ class UsersController extends Controller
         ]);
     }
 
+    /**
+     * Сохранение измененных данных пользователя @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(User $user)
     {
+        // валидация
         Request::validate([         
             'photo' => ['nullable', 'image'],
         ]);
 
+        // изменение фотографии
         if (Request::file('photo')) {
             $user->update(['photo_path' => Request::file('photo')->store('users')]);
         }
-
+        // изменение прав доступа
         if (Auth::user()->hasRole('admin')) {
-            $user->updateRoles(Request::get('selectedRoles'));
-            //$user->updatePermissions(Request::get('selectedPermissions'));
+            $user->updateRoles(Request::get('selectedRoles'));           
             $user->updateOrganizations(Request::get('selectedOrganizations'));
         }
 
-        return Redirect::back()->with('success', 'Данные пользователя обновлены.');
+        return redirect()->back()->with('success', 'Данные пользователя обновлены.');
     }
 
+    /**
+     * Удаление пользователя @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(User $user)
     {        
         $user->delete();
-
-        return Redirect::back()->with('success', 'Пользователь удален.');
+        return redirect()->back()->with('success', 'Пользователь удален.');
     }
 
+    /**
+     * Восстановление удаленного пользователя @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function restore(User $user)
     {
         $user->restore();
-
-        return Redirect::back()->with('success', 'Пользователь восстановлен.');
-    }
-
-    
+        return redirect()->back()->with('success', 'Пользователь восстановлен.');
+    }    
     
 }

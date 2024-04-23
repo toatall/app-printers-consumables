@@ -34,7 +34,7 @@ const form = useForm({
     count: null,
     selectedOrganizations: [props.auth.user.org_code],
     changeOrganization: false,
-    step: step.value,
+    step: step,
 })
 
 const save = () => {
@@ -68,7 +68,7 @@ const validateForm = () => {
     form.post(urls.consumables.counts.validate(step.value), {
         onSuccess: () => {            
 
-            if (step.value == 0) {                
+            if (step.value == 0) {
                 // поиск документа с уже выбранным расходным материалом
                 findConsumable() 
             }

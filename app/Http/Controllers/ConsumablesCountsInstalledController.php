@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Consumable\Consumable;
+use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountInstalled;
 use Illuminate\Http\Request;
 
@@ -10,9 +12,9 @@ class ConsumablesCountsInstalledController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Consumable $consumable, ConsumableCount $count)
     {
-        //
+        
     }
 
     /**

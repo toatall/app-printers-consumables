@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 /**
+ * Запись об установке расходного материала
+ * 
  * @property int $id
  * @property int $id_consumable_count
+ * @property int $id_printer_workspace
  * @property int $id_author
  * @property int $count
  * @property string $created_at

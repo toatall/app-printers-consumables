@@ -8,8 +8,15 @@ use App\Models\Organization;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
+/**
+ * Управление организациями
+ */
 class OrganizationsController extends Controller
 {
+    /**
+     * Список организаций
+     * @return \Inertia\Response
+     */
     public function index()
     {        
         return Inertia::render('Dictionary/Organizations/Index', [
@@ -18,6 +25,10 @@ class OrganizationsController extends Controller
         ]);
     }
 
+    /**
+     * Добавление организации
+     * @return \Inertia\Response
+     */
     public function create()
     {
         return Inertia::render('Dictionary/Organizations/Create', [
@@ -25,6 +36,11 @@ class OrganizationsController extends Controller
         ]);
     }
 
+    /**
+     * Сохранение новой организации
+     * @param OrganizationRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(OrganizationRequest $request)
     {
         $organization = Organization::create($request->only(['code', 'name']));
@@ -35,6 +51,11 @@ class OrganizationsController extends Controller
             ->with('success', 'Запись успешно добавлена!');
     }
 
+    /**
+     * Детальная информация об организации $organization
+     * @param Organization $organization
+     * @return \Inertia\Response
+     */
     public function show(Organization $organization)
     {
         return Inertia::render('Dictionary/Organizations/Show', [
@@ -43,6 +64,11 @@ class OrganizationsController extends Controller
         ]);
     }
 
+    /**
+     * Редактирование организации $organization
+     * @param Organization $organization
+     * @return \Inertia\Response
+     */
     public function edit(Organization $organization)
     {        
         return Inertia::render('Dictionary/Organizations/Edit', [
@@ -51,6 +77,12 @@ class OrganizationsController extends Controller
         ]);
     }
 
+    /**
+     * Сохранение отредактированной организации $organization
+     * @param Organization $organization
+     * @param OrganizationRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(OrganizationRequest $request, Organization $organization)
     {
         $organizationUpdate = $organization->update($request->only(['code', 'name']));        
@@ -61,17 +93,15 @@ class OrganizationsController extends Controller
             ->with('success', 'Запись успешно обновлена!');
     }
 
+    /**
+     * Удаление организации $organization
+     * @param Organization $organization
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Organization $organization)
     {
         $organization->delete();
-
         return Redirect::back()->with('success', 'Organization deleted.');
     }
 
-    public function restore(Organization $organization)
-    {
-        $organization->restore();
-
-        return Redirect::back()->with('success', 'Organization restored.');
-    }
 }

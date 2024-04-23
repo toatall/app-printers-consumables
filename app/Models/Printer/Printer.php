@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 /**
+ * Принтер (справочник)
+ * 
  * @property int $id
  * @property string $vendor
  * @property string $model
@@ -49,18 +50,19 @@ class Printer extends Model
         'is_color_print' => 'boolean',
     ];    
 
+    /**
+     * {@inheritDoc}
+     */
     public static function boot()
     {
         parent::boot();
         self::creating(function(Printer $model) {
             $model->id_author = Auth::id();
-        });
-        // self::updating(function(Printer $model){
-        //     $model->id_author = Auth::id();
-        // });
+        });        
     }
 
     /**
+     * Описание атрибутов
      * @return array
      */
     public static function labels()
@@ -75,17 +77,17 @@ class Printer extends Model
         ];
     }
 
-    /**
-     * Производитель и модель
-     * @return string
-     */
-    public function getFullNameAttribute()
-    {
-        return "{$this->vendor} {$this->model}";
-    }
+    // /**
+    //  * Производитель и модель
+    //  * @return string
+    //  */
+    // public function getFullNameAttribute()
+    // {
+    //     return "{$this->vendor} {$this->model}";
+    // }
 
     /**
-     * Расходные материалы принтера
+     * Расходные материалы привязанные к текущему принтеру
      * @return BelongsToMany
      */
     public function consumables(): BelongsToMany
@@ -93,7 +95,11 @@ class Printer extends Model
         return $this->belongsToMany(Consumable::class, 'printers_consumables', 'id_printer', 'id_consumable');   
     }
 
-    public function consumablesNotIn()
+    /**
+     * Расходные материалы не привязанные к текущему принтеру
+     * @return Builder 
+     */
+    public function consumablesNotIn(): Builder
     {
         return Consumable::whereDoesntHave('printers', fn(Builder $query) => 
             $query->where('printers.id', $this->id)
@@ -101,55 +107,16 @@ class Printer extends Model
     }
 
     /**
-     * Автор
+     * Автор записи
      * @return BelongsTo
      */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_author');
-    }
-
-
-    // public static function filter(array $filters)
-    // {
-    //     return DB::table('printers')            
-    //         ->select(
-    //             'printers.id',
-    //             'printers.vendor',
-    //             'printers.model',                
-    //             //DB::raw("printers.vendor + ' ' + printers.model as printer_full_name"),
-    //             'printers.color_print',
-    //             DB::raw('printers.created_at as printer_created_at'),
-    //             DB::raw('printers.updated_at as printer_updated_at'),
-    //             DB::raw('printers_consumables.id as consumable_id'),
-    //             // 'printers_consumables.id_printer',
-    //             DB::raw('printers_consumables.type_consumable as type_consumable'),
-    //             DB::raw('printers_consumables.name as consumable_name'),
-    //             DB::raw('printers_consumables.color as consumable_color'),
-    //             DB::raw('printers_consumables.description as consumable_description'),
-    //             DB::raw('printers_consumables.count_local as consumable_count_local'),
-    //             DB::raw('printers_consumables.count_stock as consumable_count_stock'),
-    //             DB::raw('printers_consumables.created_at as consumable_created_at'),
-    //             DB::raw('printers_consumables.updated_at as consumable_updated_at'),
-    //         )
-    //         ->orderBy('printers.vendor')
-    //         ->orderBy('printers.model')
-    //         ->leftJoin('printers_consumables', 'printers_consumables.id_printer', '=', 'printers.id')    
-    //         ->when($filters['search'] ?? null, fn($query, $search) => 
-    //             $query->where('printers.vendor', 'like', "%$search%")
-    //                 ->orWhere('printers.model', 'like', "%$search%")
-    //                 ->orWhere('printers_consumables.name', 'like', "%$search%")
-    //                 ->orWhere('printers_consumables.description', 'like', "%$search%")
-    //         )
-    //         ->get()
-    //         ->map(function($val) { 
-    //             $val->printer_full_name = "{$val->vendor} {$val->model}";
-    //             return $val; 
-    //         });
-    // }
-
+    }    
 
     /**
+     * Фильтр
      * @param Builder $query
      * @param array $filter
      */

@@ -5,6 +5,9 @@ namespace App\Http\Requests;
 use App\Models\Consumable\ConsumableCount;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Количество расходных материалов
+ */
 class ConsumableCountRequest extends FormRequest
 {
     
@@ -33,7 +36,6 @@ class ConsumableCountRequest extends FormRequest
             'selectedOrganizations' => 'required',
         ];        
     }
-
 
     /**
      * {@inheritDoc}

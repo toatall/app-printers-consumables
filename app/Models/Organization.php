@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * Организация
+ * 
  * @property string $code
  * @property string $name
  * @property string $created_at
@@ -25,6 +27,9 @@ class Organization extends Model
      */
     protected $primaryKey = 'code';
 
+    /**
+     * {@inheritDoc}
+     */
     protected $keyType = 'string';
 
     /**
@@ -35,6 +40,10 @@ class Organization extends Model
         'name',
     ];   
 
+    /**
+     * Описание аттрибутов
+     * @return array
+     */
     public static function labels()
     {
         return [

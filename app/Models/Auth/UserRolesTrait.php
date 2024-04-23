@@ -4,10 +4,14 @@ namespace App\Models\Auth;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * Управление ролями пользователя
+ */
 trait UserRolesTrait
 {
     /**
-     * @param string|array $role
+     * Проверка принадлежности роли(ей) $role пользователю
+     * @param string|array $role 
      * @return bool
      */
     public function hasRole(string|array $role): bool
@@ -16,6 +20,7 @@ trait UserRolesTrait
     }
 
     /**
+     * Роли пользователя
      * @return BelongsToMany
      */
     public function roles(): BelongsToMany
@@ -24,6 +29,7 @@ trait UserRolesTrait
     }
 
     /**
+     * Установка ролей $roles пользователю
      * @param array $roles
      */
     public function updateRoles($roles)
@@ -53,6 +59,10 @@ trait UserRolesTrait
         $this->roles()->detach();
     }
 
+    /**
+     * Описание ролей
+     * @todo добавить в БД
+     */
     public static function rolesLabels()
     {
         return [

@@ -8,6 +8,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
+/**
+ * Принтер
+ */
 class PrinterRequest extends FormRequest
 {
 
@@ -54,6 +57,9 @@ class PrinterRequest extends FormRequest
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function attributes(): array
     {
         return Printer::labels();

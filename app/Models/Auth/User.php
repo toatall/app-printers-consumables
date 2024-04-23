@@ -13,6 +13,8 @@ use Laravel\Sanctum\HasApiTokens;
 
 
 /**
+ * Пользователь
+ * 
  * @property int $id
  * @property string $name
  * @property string $email
@@ -109,24 +111,24 @@ class User extends Authenticatable
         });
     }
 
-    public function resolveRouteBinding($value, $field = null)
-    {
-        return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
-    }
+    // public function resolveRouteBinding($value, $field = null)
+    // {
+    //     return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
+    // }
 
-    public function availableOrganizations()
-    {
-        if (Auth::user()->hasRole('admin')) {
-            return Organization::all();
-        }
-        return $this->organizations;
-    }
+    // public function availableOrganizations()
+    // {
+    //     if (Auth::user()->hasRole('admin')) {
+    //         return Organization::all();
+    //     }
+    //     return $this->organizations;
+    // }
 
-    public function changeSelectedOrganization($code)
-    {
-        $this->org_code = $code;
-        $this->save();
-    }
+    // public function changeSelectedOrganization($code)
+    // {
+    //     $this->org_code = $code;
+    //     $this->save();
+    // }
 
     
 }

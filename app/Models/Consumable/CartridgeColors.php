@@ -7,6 +7,9 @@ namespace App\Models\Consumable;
 class CartridgeColors
 {
 
+    /**
+     * @var array
+     */
     private static $_colors = [
         'black' => [
             'name' => 'Черный (black)',
@@ -30,6 +33,9 @@ class CartridgeColors
         ],        
     ];
 
+    /**
+     * @return array
+     */
     public static function get()
     {
         return self::$_colors;

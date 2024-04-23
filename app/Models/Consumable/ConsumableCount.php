@@ -2,18 +2,22 @@
 
 namespace App\Models\Consumable;
 
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
+ * Количество расходного материала
+ * 
  * @property int $id
  * @property int $id_consumable
  * @property int $count
  * 
  * @property Consumable $consumable
  * @property ConsumableCountAdded[] $consumablesAdded
+ * @property Organization[] $organizations
  */
 class ConsumableCount extends Model
 {
@@ -42,13 +46,17 @@ class ConsumableCount extends Model
         return $this->belongsTo(Consumable::class, 'id_consumable');
     }
 
+    /**
+     * Записи, содержащие количество добавленных расходных материалов
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function consumablesAdded()
     {
         return $this->hasMany(ConsumableCountAdded::class, 'id_consumable_count');
     }
 
     /**
-     * Список аттрибутов
+     * Описание атрибутов
      * @return array
      */
     public static function labels()
@@ -63,7 +71,8 @@ class ConsumableCount extends Model
     }  
 
     /**
-     * Поиск записи по идентификатору и текущей организации
+     * Поиск записи по идентификатору расходного материала и текущей организации (Auth::user()->org_code)
+     * @param int $idConsumable
      * @return ConsumableCount|null
      */
     public static function findByIdConsumable($idConsumable)
@@ -99,7 +108,7 @@ class ConsumableCount extends Model
     }
 
     /**
-     * Поисковый фильтр
+     * Фильтр
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $filter
      */
@@ -129,14 +138,23 @@ class ConsumableCount extends Model
     }
 
     /**
-     * Привязанные организации к текущей записи
+     * Привязанные коды организаций к текущей записи
      * @return \Illuminate\Support\Collection
      */
-    public function organizations()
+    public function organizationsCodes()
     {
         return DB::table('consumables_counts_organizations')
             ->where('id_consumable_count', $this->id)
             ->pluck('org_code');
+    }
+
+    /**
+     * Привязанные организации к текущей записи
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class, 'consumables_counts_organizations', 'id_consumable_count', 'org_code');
     }
 
 }

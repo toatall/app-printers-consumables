@@ -9,9 +9,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
+/**
+ * Принтеры на рабочих местах
+ */
 class PrintersWorkplaceController extends Controller
 {
 
+    /**
+     * Все принтеры (из справочника)
+     * Для использования в выпадающем списке (dropdown)
+     * @return \Illuminate\Support\Collection
+     */
     private function allPrinters()
     {
         return Printer::all()->transform(fn(Printer $printer) => [
@@ -21,7 +29,9 @@ class PrintersWorkplaceController extends Controller
     }
     
     /**
-     * Display a listing of the resource.
+     * Список принтеров на рабочих местах,
+     * привязанных к организации, которая установлена у пользователя
+     * @return \Inertia\Response
      */
     public function index()
     {
@@ -33,7 +43,8 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Добавление принтера
+     * @return \Inertia\Response
      */
     public function create()
     {
@@ -44,7 +55,9 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Сохранение нового принтера
+     * @param PrinterWorkplaceRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(PrinterWorkplaceRequest $request)
     {
@@ -62,7 +75,8 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Детальная информация о принтере @param PrinterWorkplace $workplace
+     * @return \Inertia\Response
      */
     public function show(PrinterWorkplace $workplace)
     {                
@@ -76,7 +90,8 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Редактирование принтера @param PrinterWorkplace $workplace
+     * @return \Inertia\Response
      */
     public function edit(PrinterWorkplace $workplace)
     {
@@ -89,7 +104,9 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Сохранение отредактированного принтера @param PrinterWorkplace $workplace
+     * @param PrinterWorkplaceRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(PrinterWorkplaceRequest $request, PrinterWorkplace $workplace)
     {
@@ -102,7 +119,8 @@ class PrintersWorkplaceController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удаление принтера @param PrinterWorkplace $workplace
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(PrinterWorkplace $workplace)
     {

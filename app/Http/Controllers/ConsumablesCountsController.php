@@ -9,6 +9,7 @@ use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountAdded;
 use App\Models\Consumable\ConsumableTypesEnum;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -136,7 +137,7 @@ class ConsumablesCountsController extends Controller
             return [
                 'id' => $consumableCount->id,
                 'count' => $consumableCount->count,
-                'organizations' => $consumableCount->organizations(),
+                'organizations' => $consumableCount->organizationsCodes(),
             ];
         }
     }    
@@ -161,10 +162,18 @@ class ConsumablesCountsController extends Controller
             'consumable' => $consumable,
             'consumableTitle' => $consumable->title(),
             'consumableCountLabels' => ConsumableCount::labels(),
-            'organizations' => $consumableCount->organizations(),
+            'organizations' => $consumableCount->organizations,
+            'organizationLabels' => Organization::labels(),
+            'allOrganizations' => Organization::all(),
         ]);
     }
 
+    /**
+     * Прибавление количества (поступление расходных материалов)
+     * @param ConsumableCountRequest $request
+     * @param ConsumableCount $count общее количество
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(ConsumableCountRequest $request, ConsumableCount $count)
     {       
         DB::beginTransaction();
@@ -187,6 +196,20 @@ class ConsumablesCountsController extends Controller
         return redirect()->route('counts.show', [$count])
             ->with('success', 'Данные успешно сохранены!');
 
-    }    
+    }
+
+    /**
+     * Изменение списка привязанных организаций
+     * @param ConsumableCountRequest $request
+     * @param ConsumableCount $count общее количество
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateOrganizations(ConsumableCountRequest $request, ConsumableCount $count)
+    {
+        $organizations = $request->get('selectedOrganizations');
+        $count->updateOrganizations($organizations);
+        return redirect()->route('counts.show', [$count])
+            ->with('success', 'Данные успешно сохранены!');
+    }
 
 }

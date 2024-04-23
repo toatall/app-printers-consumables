@@ -5,7 +5,9 @@ namespace App\Http\Requests\Dictionary;
 use App\Models\Organization;
 use Illuminate\Foundation\Http\FormRequest;
 
-
+/**
+ * Организация
+ */
 class OrganizationRequest extends FormRequest
 {
 
@@ -40,6 +42,9 @@ class OrganizationRequest extends FormRequest
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function attributes(): array
     {
         return Organization::labels();

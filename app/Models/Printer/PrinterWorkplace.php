@@ -7,9 +7,12 @@ use App\Models\Organization;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 /**
+ * Принтер (на рабочем месте)
+ * 
  * @property int $id
  * @property int $id_printer
  * @property int $id_author
@@ -56,6 +59,7 @@ class PrinterWorkplace extends Model
     }
 
     /**
+     * Описание атрибутов
      * @return array
      */
     public static function labels()
@@ -73,23 +77,35 @@ class PrinterWorkplace extends Model
         ];
     }
 
-
-    public function printer()
+    /**
+     * Принтер (справочник)
+     * @return BelongsTo
+     */
+    public function printer(): BelongsTo
     {
         return $this->belongsTo(Printer::class, 'id_printer');
     }
 
-    public function organization()
+    /**
+     * Организация
+     * @return BelongsTo
+     */
+    public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'org_code');
     }
 
-    public function author()
+    /**
+     * Автор записи
+     * @return BelongsTo
+     */
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_author');
     }
 
     /**
+     * Фильтр
      * @param Builder $query
      * @param array $filter
      */

@@ -6,10 +6,14 @@ use App\Models\Organization;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Управлениями привязками организаций к пользователю
+ */
 trait UserOrganizationsTrait
 {
 
     /**
+     * Организации привязанные к пользователю
      * @return BelongsToMany
      */    
     public function organizations(): BelongsToMany
@@ -18,6 +22,7 @@ trait UserOrganizationsTrait
     }
 
     /**
+     * Проверка наличия привязки к организации с кодом $code
      * @param string|array $code
      * @return bool
      */
@@ -27,6 +32,7 @@ trait UserOrganizationsTrait
     }
     
     /**
+     * Установка организаций пользователю
      * @param array $organizations
      */
     public function updateOrganizations($organizationsCodes)
@@ -46,6 +52,9 @@ trait UserOrganizationsTrait
         }
     }
 
+    /**
+     * Удаление привязанных организаций
+     */
     private function clearOrganizations()
     {
         $this->organizations()->detach();

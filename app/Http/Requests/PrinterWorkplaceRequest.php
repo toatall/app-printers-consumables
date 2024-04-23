@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
+/**
+ * Принтер на рабочем месте
+ */
 class PrinterWorkplaceRequest extends FormRequest
 {
 

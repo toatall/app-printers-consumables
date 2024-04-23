@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
+/**
+ * Привязка расходного материала к принтерам
+ */
 class ConsumablesPrintersController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Список привязанных принтеров к расходному материалу
+     * @param Consumable $consumable расходный материал
+     * @return \Inertia\Response
      */
     public function index(Consumable $consumable)
     {        
@@ -26,7 +31,12 @@ class ConsumablesPrintersController extends Controller
         ]);
     }
 
-
+    /**
+     * Привязка принтера $printer с расходным материалом $consumable
+     * @param Printer $printer 
+     * @param Consumable $consumable
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function add(Consumable $consumable, Printer $printer)
     {
         $consumable->printers()->attach($printer->id, ['id_author' => Auth::id()]);
@@ -34,9 +44,12 @@ class ConsumablesPrintersController extends Controller
             ->with('success', 'Связь успешно добавлена!');
     }
 
-    // /**
-    //  * Remove the specified resource from storage.
-    //  */
+    /**
+     * Удаление привязки принтера $printer с расходным материалом $consumable
+     * @param Printer $printer
+     * @param Consumable $consumable
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Consumable $consumable, Printer $printer)
     {
         $consumable->printers()->detach($printer->id);

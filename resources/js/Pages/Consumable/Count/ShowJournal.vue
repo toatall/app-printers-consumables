@@ -27,67 +27,91 @@ const idConsumableCount = props.consumableCount.id
 const dataItemsAdded = ref()
 const dataItemsInstalled = ref()
 
-
-const updateJournalAdded = () => {    
-    axios.get(urls.consumables.counts.journal.added.index(idConsumable, idConsumableCount))
-        .then((response) => {
-            dataItemsAdded.value = response.data
-        })
-        .catch((error) => {
-            toast.add({
-                severity: 'error',
-                summary: 'Ошибка загрузки журнала добавления расходных материалов',
-                detail: error.message,
-                life: 5000,
-            })
-            console.error(error)
-        })
-}
-const updateJournalInstalled = () => {    
-    axios.get(urls.consumables.counts.journal.added.index(idConsumable, idConsumableCount))
-        .then((response) => {
-            dataItemsAdded.value = response.data
-        })
-        .catch((error) => {
-            toast.add({
-                severity: 'error',
-                summary: 'Ошибка загрузки журнала добавления расходных материалов',
-                detail: error.message,
-                life: 5000,
-            })
-            console.error(error)
-        })
-}
-
-onMounted(() => {   
-    updateJournalAdded()
-})
-
 const journalAdded = {
+    loading: ref(false),
     loadingDelete: ref(false),
     idDelete: ref(0),
 }
+const journalInstalled = JSON.parse(JSON.stringify(journalAdded))
 
-const redoJournalAdded = (id) => {        
+// загрузка журнала
+const baseUpdate = (url, refObj, refParamsObj, errorTitle) => {
+    refParamsObj.loading.value = true
+    axios.get(url)
+        .then((response) => {
+            if (Array.isArray(response.data)) {
+                refObj.value = response.data            
+            }
+            refParamsObj.loading.value = false
+        })
+        .catch((error) => {
+            toast.add({
+                severity: 'error',
+                summary: errorTitle,
+                detail: error.message,
+                life: 5000,
+            })
+            console.error(error)
+        })
+}
+
+const updateJournalAdded = () => {        
+    baseUpdate(
+        urls.consumables.counts.journal.added.index(idConsumable, idConsumableCount), 
+        dataItemsAdded,
+        journalAdded,
+        'Ошибка загрузки журнала добавления расходных материалов',
+    )
+}
+const updateJournalInstalled = () => {    
+    baseUpdate(
+        urls.consumables.counts.journal.installed.index(idConsumable, idConsumableCount), 
+        dataItemsInstalled,
+        journalInstalled,
+        'Ошибка загрузки журнала установки расходных материалов',
+    )
+}
+
+const baseRedo = (url, id, refLoadingObj, fnUpdate) => {
     confirm.require({
         message: 'Вы уверены, что хотите отменить операцию?',
         header: 'Отмена операции',
-        accept: () => {
-            journalAdded.idDelete.value = id
-            journalAdded.loadingDelete.value = true
+        accept: () => {            
+            refLoadingObj.idDelete.value = id
+            refLoadingObj.loadingDelete.value = true
 
-            Inertia.delete(urls.consumables.counts.journal.added.redo(idConsumable, idConsumableCount, id), {
+            Inertia.delete(url, {
                 onSuccess: () => {
-                    updateJournalAdded()
-                    
-                    journalAdded.idDelete.value = 0
-                    journalAdded.loadingDelete.value = false
+                    fnUpdate()                    
+                    refLoadingObj.idDelete.value = 0
+                    refLoadingObj.loadingDelete.value = false
                 },
             })
         },
     })
 }
 
+const redoJournalAdded = (id) => {            
+    baseRedo(
+        urls.consumables.counts.journal.added.redo(idConsumable, idConsumableCount, id),
+        id,
+        journalAdded,
+        updateJournalAdded
+    )
+}
+const redoJournalInstalled = (id) => {            
+    baseRedo(
+        urls.consumables.counts.journal.installed.redo(idConsumable, idConsumableCount, id),
+        id,
+        journalInstalled,
+        updateJournalInstalled
+    )
+}
+
+onMounted(() => {   
+    updateJournalAdded()
+    updateJournalInstalled()
+})
 
 </script>
 <template>    
@@ -106,7 +130,8 @@ const redoJournalAdded = (id) => {
                 :metaKeySelection="false"
                 class="w-full" 
                 tableStyle="min-width: 50rem" 
-                selectionMode="single"                        
+                selectionMode="single"
+                :loading="journalAdded.loading.value"
             >
                 <Column header="#" headerStyle="width:3rem" sortable>
                     <template #body="slotProps">
@@ -114,7 +139,7 @@ const redoJournalAdded = (id) => {
                     </template>                        
                 </Column>
                 <Column header="Количество" field="count" sortable />
-                <Column header="Автор" field="author.name" sortable>>
+                <Column header="Автор" field="author.name" sortable>
                     <template #body="{ data }">
                         <div v-if="data?.author?.fio" class="mb-2">
                             {{ data.author.fio }}
@@ -138,7 +163,9 @@ const redoJournalAdded = (id) => {
                             v-tooltip="`Отменить`" 
                             icon="fas fa-redo-alt fa-flip-horizontal" 
                             @click="redoJournalAdded(data.id)" 
-                            :loading="journalAdded.loadingDelete && data.id === journalAdded.idDelete.value" />
+                            :loading="journalAdded.loadingDelete && data.id === journalAdded.idDelete.value" 
+                            severity="danger"
+                        />
                     </template>
                 </Column>
 
@@ -153,6 +180,55 @@ const redoJournalAdded = (id) => {
                     Установлены
                 </div>
             </template>
+
+            <DataTable :value="dataItemsInstalled"
+                paginator 
+                :rows="10" 
+                dataKey="id" 
+                :metaKeySelection="false"
+                class="w-full" 
+                tableStyle="min-width: 50rem" 
+                selectionMode="single"
+                :loading="journalInstalled.loading.value"
+            >
+                <Column header="#" headerStyle="width:3rem" sortable>
+                    <template #body="slotProps">
+                        {{ slotProps.index + 1 }}
+                    </template>                        
+                </Column>
+                <Column header="Количество" field="count" sortable />
+                <Column header="Автор" field="author.name" sortable>
+                    <template #body="{ data }">
+                        <div v-if="data?.author?.fio" class="mb-2">
+                            {{ data.author.fio }}
+                        </div>
+                        {{ data?.author?.name ?? 'Неизвестно' }}
+                    </template>
+                </Column>
+                <Column field="created_at" header="Дата" sortable>
+                    <template #body="{ data }">
+                        <div>
+                            <div v-tooltip="moment(data.created_at).format('LLLL')">
+                                <i class="far fa-calendar"></i>
+                                {{ moment(data.created_at).fromNow() }}
+                            </div>                                                    
+                        </div>
+                    </template>
+                </Column>
+                <Column header="">
+                    <template #body="{ data }">
+                        <Button 
+                            v-tooltip="`Отменить`" 
+                            icon="fas fa-redo-alt fa-flip-horizontal" 
+                            @click="redoJournalInstalled(data.id)" 
+                            :loading="journalInstalled.loadingDelete && data.id === journalInstalled.idDelete.value" />
+                    </template>
+                </Column>
+
+                <template #empty> Нет данных </template>
+
+            </DataTable> 
+
         </TabPanel>
 
     </TabView>

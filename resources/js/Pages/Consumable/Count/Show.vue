@@ -1,15 +1,22 @@
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
 import { inject, ref, defineAsyncComponent, computed } from 'vue'
-import Card from 'primevue/card'
-import TabMenu from 'primevue/tabmenu'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 import Chip from 'primevue/chip'
 import DetailViewer from '@/Shared/DetailViewer'
 import Button from 'primevue/button'
 import { useDialog } from 'primevue/usedialog'
 import ShowJournal from './ShowJournal.vue'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import Label from '@/Shared/Label'
+import Checkbox from 'primevue/checkbox'
+import InlineMessage from 'primevue/inlinemessage'
+import Panel from 'primevue/panel'
+
 
 defineOptions({
     layout: Layout
@@ -20,6 +27,8 @@ const props = defineProps({
     consumableTitle: String,
     consumableCountLabels: Object,
     organizations: Array,
+    organizationLabels: Object,
+    allOrganizations: Array,
 })
 const urls = inject('urls')
 const title = props.consumableTitle
@@ -73,11 +82,26 @@ const actions = {
             }
         })
     },
+    organizationsEdit: () => {
+
+    },
 }
 
 const bgColor = computed(() => props.consumableCount.count <= 1 ? 'bg-red-500' : 
     (props.consumableCount.count < 10 ? 'bg-yellow-500' : 'bg-primary-500') 
 )
+
+const visibleOrganizationsEdit = ref(false)
+const form = useForm({
+    id_consumable: props.consumable.id,
+    count: 1,
+    selectedOrganizations: Array.from(props.organizations).map((item) => item.code),
+})
+const saveOrganizations = () => {
+    form.put(urls.consumables.counts.updateOrganizations(props.consumableCount.id), {
+        onSuccess: () => visibleOrganizationsEdit.value = false
+    })
+}
 
 </script>
 <template>
@@ -89,49 +113,96 @@ const bgColor = computed(() => props.consumableCount.count <= 1 ? 'bg-red-500' :
         { label: title },
     ]" />
 
-        
-    <TabMenu :model="items" />
-    <Card>
-        <template #content>
-            <p class="m-0" v-if="visible == 1">
-                <Chip class="pl-0 pr-3">
-                    <span 
-                        class="font-bold text-2xl text-surface-0 rounded-full w-12 h-12 flex items-center justify-center"
-                        :class="bgColor"
-                    >
-                        {{ consumableCount.count }}
-                    </span>
-                    <span class="ml-2 font-medium">
-                        доступное количество
-                    </span>
-                    <Button text rounded icon="pi pi-plus" class="font-bold" @click="actions.add" />
-                </Chip>
+    <TabView lazy="true">
+        <TabPanel>
+            <template #header>
+                <i class="pi pi-home me-2"></i> Главная
+            </template>
+            <Chip class="pl-0 pr-3">
+                <span 
+                    class="font-bold text-2xl text-surface-0 rounded-full w-12 h-12 flex items-center justify-center"
+                    :class="bgColor"
+                >
+                    {{ consumableCount.count }}
+                </span>
+                <span class="ml-2 font-medium">
+                    доступное количество
+                </span>
+                <Button text rounded icon="pi pi-plus" class="font-bold" @click="actions.add" />
+            </Chip>
 
-                <DetailViewer class="mt-8" :items="[                    
-                    { 
-                        label: consumableCountLabels.created_at, 
-                        value: props.consumableCount.created_at,
-                        is_date: true,
-                        icon: 'far fa-calendar',
-                    },
-                    { 
-                        label: consumableCountLabels.updated_at, 
-                        value: props.consumableCount.updated_at,
-                        is_date: true,
-                        icon: 'far fa-calendar-alt',                        
-                    },
-                ]"></DetailViewer>  
+            <DetailViewer class="mt-8" :items="[                    
+                { 
+                    label: consumableCountLabels.created_at, 
+                    value: props.consumableCount.created_at,
+                    is_date: true,
+                    icon: 'far fa-calendar',
+                },
+                { 
+                    label: consumableCountLabels.updated_at, 
+                    value: props.consumableCount.updated_at,
+                    is_date: true,
+                    icon: 'far fa-calendar-alt',                        
+                },
+            ]"></DetailViewer>  
+        </TabPanel>
 
-            </p>
-            <p class="m-0" v-else-if="visible == 2">
-                <ShowJournal :consumable="consumable" :consumableCount="consumableCount" />
-            </p>
-            <p class="m-0" v-else-if="visible == 3">
-                3333
-            </p>                    
-        </template>                
-    </Card>
+        <TabPanel>
+            <template #header>
+                <i class="pi pi-replay me-2"></i> Журнал
+            </template>
+            <ShowJournal :consumable="consumable" :consumableCount="consumableCount" />
+        </TabPanel>
 
+        <TabPanel>
+            <template #header>
+                <i class="pi pi-list me-2"></i> Организации
+            </template>
+            
+            <div v-if="visibleOrganizationsEdit">
+                <div>      
+                    <form @submit.prevent="saveOrganizations">                        
+                        <Panel header="Редактирование списка организаций">
+                            <template #footer>
+                                <Button severity="secondary" @click="visibleOrganizationsEdit = false" size="small" label="Назад" />
+                                <Button type="submit" :loading="form.processing" class="ms-2" icon="pi pi-save" label="Сохранить" size="small" />
+                            </template>                        
+                            <div class="w-1/3">
+                                <div class="w-full" id="organizations">                                                  
+                                    <div v-for="organization in allOrganizations" :key="organization.code" class="flex items-center mt-2">
+                                        <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
+                                        <label :for="organization.code" class="ml-2 cursor-pointer">
+                                            {{ `${organization.name} (${organization.code})` }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <InlineMessage v-if="form.errors?.selectedOrganizations" class="mt-2" severity="error">{{ form.errors?.selectedOrganizations }}</InlineMessage>
+                            </div>                                           
+                        </Panel>
+                    </form>
+                </div>
+            </div>
 
+            <DataTable :value="organizations"
+                dataKey="code"
+                class="w-1/3"
+                selectionMode="single"
+                v-else
+            >          
+                <template #header>
+                    <Button severity="success" @click="visibleOrganizationsEdit = true" size="small" label="Редактировать" />                        
+                </template>      
+
+                <Column :header="props.organizationLabels.code" field="code" sortable />
+                <Column :header="props.organizationLabels.name" field="name" sortable />
+
+                <template #empty> Нет данных </template>
+
+            </DataTable>
+
+        </TabPanel>
+
+    </TabView>
+    
 
 </template>

@@ -4,10 +4,14 @@ namespace App\Models\Auth;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * Управление разрешениями пользователя
+ */
 trait UserPermissionsTrait
 {
 
     /**
+     * Привязанные разрешения к пользователю
      * @return BelongsToMany
      */
     public function permissions(): BelongsToMany
@@ -16,6 +20,7 @@ trait UserPermissionsTrait
     }
 
     /**
+     * Проверка разрешения(ий) $permission у пользователя 
      * @param string|array $permission
      * @return bool
      */
@@ -26,7 +31,8 @@ trait UserPermissionsTrait
     }
     
     /**
-     * @param array $permissions
+     * Установка разрешений
+     * @param array $permissions пользователю
      */
     public function updatePermissions($permissions)
     {        
@@ -34,14 +40,17 @@ trait UserPermissionsTrait
         if ($this->hasRole('admin')) {
             return;
         }
-        foreach((array)$permissions as $permission) {            
-            $permissionModel = Permission::query()->where('name', $permission)->first(); 
+        foreach((array)$permissions as $permission) {
+            $permissionModel = Permission::query()->where('name', $permission)->first();
             if ($permission && !$this->hasPermission($permission)) {
                 $this->permissions()->save($permissionModel);
             }
         }
     }
 
+    /**
+     * Удаление всех разрешений у пользователя
+     */
     private function clearPermissions()
     {
         $this->permissions()->detach();
