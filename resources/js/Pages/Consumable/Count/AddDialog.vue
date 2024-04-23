@@ -9,7 +9,7 @@ import LoadingButton from '@/Shared/LoadingButton'
 const props = defineProps({
     auth: Object, 
 })
-// const consumableCountLabels = props.consumableCountLabels
+
 const urls = inject('urls')
 const dialogRef = inject('dialogRef')
 const consumableCountLabels = dialogRef.value.data.consumableCountLabels
@@ -20,9 +20,9 @@ const form = useForm({
     selectedOrganizations: [dialogRef.value.data.organizations],
 })
 function save() {        
-    form.post(urls.consumables.counts.save(), {}, {
-        onFinish: () => {
-            console.log('finish')
+    form.put(urls.consumables.counts.update(dialogRef.value.data.id), {
+        onSuccess: () => {
+            dialogRef.value.close()
         },
     })    
 }
@@ -32,8 +32,8 @@ function save() {
 <template>
     <form @submit.prevent="save">
         
-        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div class="sm:col-span-4">                        
+        <div class="grid gap-x-6 gap-y-8">
+            <div>                        
                 <Label for="count">{{ consumableCountLabels.count }}</Label>
                 <InputNumber 
                     class="w-full"

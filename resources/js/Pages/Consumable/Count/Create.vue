@@ -36,8 +36,9 @@ const form = useForm({
     changeOrganization: false,
     step: step.value,
 })
+
 const save = () => {
-    form.post(urls.consumables.counts.save())    
+    form.post(urls.consumables.counts.store())    
 }
 
 const changeOrganization = ref(form.changeOrganization)
@@ -72,7 +73,7 @@ const validateForm = () => {
                 findConsumable() 
             }
             else {
-                step.value++
+                step.value++                
             }
 
         }
@@ -137,12 +138,13 @@ const items = ref([
                         <Message severity="info" :closable="false" class="w-full">
                             Найден документ с текущим расходным материалом.<br />
                             Идентификатор документа: <strong>{{ consumableData.id }}</strong>, 
-                            коды организаций: {{ consumableData.organizations.join(', ') }}, текущее количество: {{ consumableData.count }}!<br />
+                            коды организаций: <strong>{{ consumableData.organizations.join(', ') }}</strong>, 
+                            текущее количество: <strong>{{ consumableData.count }}</strong>!<br />
                             Если необходимо изменить перечень организаций, то установите галочку "Изменить список организаций" и укажите нужные организации.
                         </Message>
                     </div>
 
-                    <div v-if="consumableFind" class="grid grid-cols-none gap-x-6 gap-y-8">
+                    <div v-if="consumableFind" class="grid grid-cols-none gap-x-6 gap-y-8 mb-4">
                         <div>  
                             <div class="w-full flex gap-x-4" id="organizations">                                                  
                                 <Checkbox v-model="changeOrganization" :binary="true" inputId="changeOrganization" />

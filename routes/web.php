@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConsumablesController;
+use App\Http\Controllers\ConsumablesCountsAddedController;
 use App\Http\Controllers\ConsumablesCountsController;
 use App\Http\Controllers\ConsumablesMoveController;
 use App\Http\Controllers\ImagesController;
@@ -85,12 +86,19 @@ Route::middleware('auth')->group(function() {
     Route::resource('printers/workplace', PrintersWorkplaceController::class);
 
     // ConsumableCount
-    Route::get('consumables/counts', [ConsumablesCountsController::class, 'index'])->name('consumables.counts');
-    Route::get('consumables/counts/create', [ConsumablesCountsController::class, 'create']);
-    Route::post('consumables/counts/save', [ConsumablesCountsController::class, 'save']);
-    Route::get('consumables/counts/{consumableCount}', [ConsumablesCountsController::class, 'show']);
-    Route::post('consumables/counts/validate/{step}', [ConsumablesCountsController::class, 'validateConsumableCount']);
+    // Route::get('consumables/counts', [ConsumablesCountsController::class, 'index'])->name('consumables.counts');
+    // Route::get('consumables/counts/create', [ConsumablesCountsController::class, 'create']);
+    // Route::post('consumables/counts/store', [ConsumablesCountsController::class, 'store']);
+    // Route::get('consumables/counts/{consumableCount}', [ConsumablesCountsController::class, 'show']);
+    // Route::post('consumables/counts/validate/{step}', [ConsumablesCountsController::class, 'validateConsumableCount']);
+    // Route::post('consumables/counts/check-exists', [ConsumablesCountsController::class, 'checkExists']);
+    Route::resource('consumables/counts', ConsumablesCountsController::class)->only(['index', 'create', 'store', 'show', 'update']);
+    Route::post('consumables/counts/validate', [ConsumablesCountsController::class, 'validateConsumableCount']);
     Route::post('consumables/counts/check-exists', [ConsumablesCountsController::class, 'checkExists']);
+    Route::get('consumables/counts/{count}/journal-added', [ConsumablesCountsController::class, 'journalAdded']);
+    Route::get('consumables/counts/{count}/journal-installed', [ConsumablesCountsController::class, 'journalInstalled']);
+    
+    Route::resource('consumables.counts.added', ConsumablesCountsAddedController::class)->only(['index', 'destroy']);
 });
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ConsumableCountRequest;
+use App\Http\Requests\ConsumableCountRequestValidate;
 use App\Models\Consumable\CartridgeColors;
 use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
@@ -37,17 +38,6 @@ class ConsumablesCountsController extends Controller
     public function index()
     {        
         $consumablesCounts = ConsumableCount::filter(Request::only(['search', 'consumableType']))->get();
-            // ->get()->transform(fn(ConsumableCount $consumableCount) => [
-            //     'id' => $consumableCount,
-            //     'count' => $consumableCount->count,
-            //     'consumable' => $consumableCount->consumable()->get()->transform(fn(Consumable $consumable) => [
-            //         'id' => $consumable->id,
-            //         'type' => $consumable->type,
-            //         'name' => $consumable->name,
-            //         'color' => $consumable->color,
-            //         'title' => $consumable->title(),
-            //     ]),
-            // ]);
         return Inertia::render('Consumable/Count/Index', [
             'filters' => Request::all(['search', 'consumableType']),
             'consumablesCounts' => $consumablesCounts,
@@ -83,7 +73,7 @@ class ConsumablesCountsController extends Controller
      * 
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function save(ConsumableCountRequest $request)
+    public function store(ConsumableCountRequest $request)
     {
         // получение данных из формы запроса
         $organizations = $request->get('selectedOrganizations');
@@ -91,13 +81,11 @@ class ConsumablesCountsController extends Controller
         $count = $request->get('count');
         $changeOrganization = $request->get('changeOrganization', false);
 
-
         DB::beginTransaction();
         $isNew = false;
 
         // поиск или создание записи о количестве расходных материалов
         // поиск выполняется по id_consumable и наличию текущей организации Auth::user()->org_code
-        //$consumableCount = ConsumableCount::findByIdConsumableAndOrgs($idConsumable, $organizations);
         $consumableCount = ConsumableCount::findByIdConsumable($idConsumable);
         // если запись не найдена, то создается новая
         if (!$consumableCount) {
@@ -128,7 +116,7 @@ class ConsumablesCountsController extends Controller
                 ->with('error', 'Возникла ошибка при сохранении!');
         }
         DB::commit();
-        return redirect()->route('consumables.counts')
+        return redirect()->route('counts.show', [$consumableCount])
             ->with('success', 'Данные успешно сохранены!');
     }
 
@@ -140,31 +128,33 @@ class ConsumablesCountsController extends Controller
     {
         $idConsumable = Request::get('id_consumable');
         if ($idConsumable === null) {
-            abort(500, 'Attribute id_consumable is null');
+            throw new \Exception('Attribute id_consumable is null');
         }
 
-        $consumableCount = ConsumableCount::findByIdConsumable($idConsumable);
+        $consumableCount = ConsumableCount::findByIdConsumable($idConsumable);        
         if ($consumableCount !== null) {
             return [
                 'id' => $consumableCount->id,
                 'count' => $consumableCount->count,
                 'organizations' => $consumableCount->organizations(),
             ];
-        }   
+        }
     }    
 
     /**
      * Валидация данных при добавлении нового документа ConsumableCount
+     * @param ConsumableCountRequestValidate $request    
      */
-    public function validateConsumableCount(ConsumableCountRequest $request, $step) { }
+    public function validateConsumableCount(ConsumableCountRequestValidate $request) { }
 
     /**
      * Отображение информации о количестве по расходному материалу $consumableCount
      * 
      * @return \Inertia\Response
      */
-    public function show(ConsumableCount $consumableCount)
+    public function show(ConsumableCount $count)
     {        
+        $consumableCount = $count;
         $consumable = $consumableCount->consumable;
         return Inertia::render('Consumable/Count/Show', [
             'consumableCount' => $consumableCount,
@@ -174,5 +164,29 @@ class ConsumablesCountsController extends Controller
             'organizations' => $consumableCount->organizations(),
         ]);
     }
+
+    public function update(ConsumableCountRequest $request, ConsumableCount $count)
+    {       
+        DB::beginTransaction();
+        
+        // создание модели ConsumableCountAdded с добавляемым количеством count
+        $consumableCountAdded = new ConsumableCountAdded([
+            'id_consumable_count' => $count->id,
+            'count' => $request->get('count'),
+        ]);
+
+        // результаты выполнения
+        if (!$consumableCountAdded->save()) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Возникла ошибка при сохранении!');
+        }
+
+        DB::commit();
+        
+        return redirect()->route('counts.show', [$count])
+            ->with('success', 'Данные успешно сохранены!');
+
+    }    
 
 }

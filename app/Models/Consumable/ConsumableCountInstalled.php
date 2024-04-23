@@ -18,14 +18,14 @@ use Illuminate\Support\Facades\Auth;
  * @property ConsumableCount $consumableCount
  * @property User $author
  */
-class ConsumableCountAdded extends Model
+class ConsumableCountInstalled extends Model
 {
     use HasFactory;
 
     /**
      * {@inheritDoc}
      */
-    protected $table = 'consumables_counts_added';
+    protected $table = 'consumables_counts_installed';
 
     public static function booting()
     {
@@ -38,7 +38,7 @@ class ConsumableCountAdded extends Model
             if ($consumableCount === null) {
                 throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
             }
-            $consumableCount->count += $model->count;
+            $consumableCount->count -= $model->count;
             $consumableCount->save();
         });
 
@@ -47,7 +47,7 @@ class ConsumableCountAdded extends Model
             if ($consumableCount === null) {
                 throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
             }
-            $consumableCount->count -= $model->count;
+            $consumableCount->count += $model->count;
             $consumableCount->save();
         });
     }
@@ -61,5 +61,5 @@ class ConsumableCountAdded extends Model
     {
         return $this->belongsTo(User::class, 'id_author');
     }
-
+    
 }

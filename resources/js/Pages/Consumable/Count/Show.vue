@@ -2,13 +2,14 @@
 import { Head } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
-import { inject, ref, defineAsyncComponent } from 'vue'
+import { inject, ref, defineAsyncComponent, computed } from 'vue'
 import Card from 'primevue/card'
 import TabMenu from 'primevue/tabmenu'
 import Chip from 'primevue/chip'
 import DetailViewer from '@/Shared/DetailViewer'
 import Button from 'primevue/button'
 import { useDialog } from 'primevue/usedialog'
+import ShowJournal from './ShowJournal.vue'
 
 defineOptions({
     layout: Layout
@@ -50,8 +51,7 @@ const items = ref([
     },    
 ])
 
-const actions = {
-    
+const actions = {    
     add: () => {        
         const dialogRef = dialog.open(AddDialog, {
             props: {
@@ -75,9 +75,9 @@ const actions = {
     },
 }
 
-const bgColor = props.consumableCount.count <= 1 ? 'bg-red-500' : 
-    (props.consumableCount.count < 10 ? 'bg-yellow-500' : 'bg-primary-500')
-
+const bgColor = computed(() => props.consumableCount.count <= 1 ? 'bg-red-500' : 
+    (props.consumableCount.count < 10 ? 'bg-yellow-500' : 'bg-primary-500') 
+)
 
 </script>
 <template>
@@ -124,7 +124,7 @@ const bgColor = props.consumableCount.count <= 1 ? 'bg-red-500' :
 
             </p>
             <p class="m-0" v-else-if="visible == 2">
-                2222
+                <ShowJournal :consumable="consumable" :consumableCount="consumableCount" />
             </p>
             <p class="m-0" v-else-if="visible == 3">
                 3333
