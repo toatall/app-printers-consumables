@@ -6,17 +6,13 @@ import InlineMessage from 'primevue/inlinemessage'
 import Label from '@/Shared/Label'
 import LoadingButton from '@/Shared/LoadingButton'
 
-const props = defineProps({
-    auth: Object, 
-})
-
 const urls = inject('urls')
 const dialogRef = inject('dialogRef')
 const consumableCountLabels = dialogRef.value.data.consumableCountLabels
 
 const form = useForm({   
     id_consumable: dialogRef.value.data.idConsumable,
-    count: null,
+    count: 1,
     selectedOrganizations: [dialogRef.value.data.organizations],
 })
 function save() {        
@@ -33,7 +29,7 @@ function save() {
     <form @submit.prevent="save">
         
         <div class="grid gap-x-6 gap-y-8">
-            <div>                        
+            <div>
                 <Label for="count">{{ consumableCountLabels.count }}</Label>
                 <InputNumber 
                     class="w-full"

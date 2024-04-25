@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PrinterWorkplaceRequest;
+use App\Models\Consumable\Consumable;
 use App\Models\Printer\Printer;
 use App\Models\Printer\PrinterWorkplace;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,17 @@ class PrintersWorkplaceController extends Controller
             'printersWorkplace' => PrinterWorkplace::filter(Request::only(['search']))->get(), 
             'printerWorkplaceLabels' => PrinterWorkplace::labels(),
         ]);
+    }
+
+    /**
+     * Список принтеров на рабочих местах для выпадающего списка
+     * привязанных к расходному материалу $consumable
+     * @param Consumable $consumable
+     * @return \Illuminate\Support\Collection
+     */
+    public function list(Consumable $consumable)
+    {
+        return $consumable->printersWorkplace();
     }
 
     /**

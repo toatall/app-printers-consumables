@@ -30,39 +30,75 @@ class ConsumableCountInstalled extends Model
      */
     protected $table = 'consumables_counts_installed';
 
+    /**
+     * {@inheritDoc}
+     * 
+     * Сохранение данных о количестве в родительской записи 
+     * с общим количеством расходных материалов
+     * При добавлении уменьшается текущее количество к общему количеству в родительской записи
+     * При удалении прибавляется текущее количество от общего количества в родительской записи
+     * @param self $model текущий объект
+     * @param bool $isPlus (true - если увеличивается, false - если уменьшается) 
+     */
+    private static function updateModel(self $model, bool $isPlus = true)
+    {                
+        $consumableCount = $model->consumableCount;
+        if ($consumableCount === null) {
+            throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
+        }
+        $count = $model->count;
+        if (!$isPlus) {
+            $count = $count * -1;
+        }
+        $consumableCount->count += $count;
+        $consumableCount->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public static function booting()
     {
         parent::booting();
-        
+         // создание объекта
         static::creating(function(self $model) {
-            $model->id_author = Auth::user()->id;
-
-            $consumableCount = $model->consumableCount;
-            if ($consumableCount === null) {
-                throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
-            }
-            $consumableCount->count -= $model->count;
-            $consumableCount->save();
+            $model->id_author = Auth::user()->id;            
+            self::updateModel($model, false);
         });
-
-        static::deleted(function(self $model) {
-            $consumableCount = $model->consumableCount;
-            if ($consumableCount === null) {
-                throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
-            }
-            $consumableCount->count += $model->count;
-            $consumableCount->save();
+        // удаление объекта
+        static::deleted(function(self $model) {          
+            self::updateModel($model, true);
         });
     }
 
+    /**
+     * Родительская запись с общим количеством расходного материала
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function consumableCount()
     {
         return $this->belongsTo(ConsumableCount::class, 'id_consumable_count');
     }
 
+    /**
+     * Автор записи
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function author()
     {
         return $this->belongsTo(User::class, 'id_author');
+    }
+
+    /**
+     * Описание атрибутов
+     * @return array
+     */
+    public static function labels(): array
+    {
+        return [
+            'id_printer_workplace' => 'Принтер',
+            'count' => 'Количество',
+        ];
     }
     
 }

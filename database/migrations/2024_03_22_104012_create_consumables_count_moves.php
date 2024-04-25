@@ -27,13 +27,13 @@ return new class extends Migration
         Schema::create('consumables_counts_installed', function (Blueprint $table) {
             $table->id();
             $table->integer('id_consumable_count')->index();
-            $table->integer('id_printer_workspace')->index();
+            $table->integer('id_printer_workplace')->index();
             $table->integer('id_author');
             $table->unsignedInteger('count');
             $table->timestamps();
 
             $table->foreign('id_consumable_count')->references('id')->on('consumables_counts')->cascadeOnDelete();
-            $table->foreign('id_printer_workspace')->references('id')->on('printers_workplace')->cascadeOnDelete();
+            $table->foreign('id_printer_workplace')->references('id')->on('printers_workplace')->cascadeOnDelete();
             $table->foreign('id_author')->references('id')->on('users');
         });
     }

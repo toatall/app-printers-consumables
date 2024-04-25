@@ -154,8 +154,12 @@ class ConsumablesCountsController extends Controller
      * @return \Inertia\Response
      */
     public function show(ConsumableCount $count)
-    {        
+    {            
         $consumableCount = $count;
+        if (!in_array(Auth::user()->org_code, $consumableCount->organizationsCodes()->toArray())) {
+            abort(404);
+        }
+        
         $consumable = $consumableCount->consumable;
         return Inertia::render('Consumable/Count/Show', [
             'consumableCount' => $consumableCount,

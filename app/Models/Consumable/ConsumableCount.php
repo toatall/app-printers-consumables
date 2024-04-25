@@ -52,7 +52,18 @@ class ConsumableCount extends Model
      */
     public function consumablesAdded()
     {
-        return $this->hasMany(ConsumableCountAdded::class, 'id_consumable_count');
+        return $this->hasMany(ConsumableCountAdded::class, 'id_consumable_count')
+            ->orderByDesc('created_at');
+    }
+
+    /**
+     * Записи, содержащие количество установленных расходных материалов
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function consumablesInstalled()
+    {
+        return $this->hasMany(ConsumableCountInstalled::class, 'id_consumable_count')
+            ->orderByDesc('created_at');
     }
 
     /**

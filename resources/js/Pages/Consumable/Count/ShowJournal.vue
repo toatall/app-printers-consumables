@@ -1,15 +1,14 @@
 <script setup>
 import axios from 'axios';
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
-import { inject, ref, onMounted, reactive } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
-import { Inertia } from '@inertiajs/inertia'
-import { useToast } from 'primevue/usetoast'
-import { useConfirm } from "primevue/useconfirm"
-
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import { inject, ref, onMounted, reactive } from 'vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import { Inertia } from '@inertiajs/inertia';
+import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 
 const props = defineProps({
     consumable: Object,
@@ -221,7 +220,9 @@ onMounted(() => {
                             v-tooltip="`Отменить`" 
                             icon="fas fa-redo-alt fa-flip-horizontal" 
                             @click="redoJournalInstalled(data.id)" 
-                            :loading="journalInstalled.loadingDelete && data.id === journalInstalled.idDelete.value" />
+                            :loading="journalInstalled.loadingDelete && data.id === journalInstalled.idDelete.value" 
+                            severity="danger"
+                        />
                     </template>
                 </Column>
 

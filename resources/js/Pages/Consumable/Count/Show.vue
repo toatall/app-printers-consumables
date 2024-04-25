@@ -34,35 +34,12 @@ const urls = inject('urls')
 const title = props.consumableTitle
 const consumableCountLabels = props.consumableCountLabels
 const dialog = useDialog()
-const AddDialog = defineAsyncComponent(() => import('./AddDialog.vue'))
-const visible = ref(1)
-const items = ref([
-    {
-        label: 'Главная',
-        icon: 'pi pi-home',
-        command: () => {
-            visible.value = 1
-        }
-    },
-    {
-        label: 'Журнал',
-        icon: 'pi pi-replay',
-        command: () => {
-            visible.value = 2
-        }
-    },
-    {
-        label: 'Организации',
-        icon: 'pi pi-list',
-        command: () => {
-            visible.value = 3
-        }
-    },    
-])
+const AddDialog = defineAsyncComponent(() => import('./Dialogs/Add.vue'))
+const SubtractDialog = defineAsyncComponent(() => import('./Dialogs/Subtract.vue'))
 
 const actions = {    
     add: () => {        
-        const dialogRef = dialog.open(AddDialog, {
+        dialog.open(AddDialog, {
             props: {
                 header: 'Добавить',
                 style: {
@@ -82,8 +59,24 @@ const actions = {
             }
         })
     },
-    organizationsEdit: () => {
-
+    subtract: () => {
+        dialog.open(SubtractDialog, {
+            props: {
+                header: 'Вычесть',
+                style: {
+                    width: '50vw',
+                },
+                breakpoints:{
+                    '960px': '75vw',
+                    '640px': '90vw'
+                },
+                modal: true,            
+            },      
+            data: {                
+                idConsumable: props.consumable.id,
+                idConsumableCount: props.consumableCount.id,                
+            }
+        }) 
     },
 }
 
@@ -113,7 +106,7 @@ const saveOrganizations = () => {
         { label: title },
     ]" />
 
-    <TabView lazy="true">
+    <TabView :lazy="true">
         <TabPanel>
             <template #header>
                 <i class="pi pi-home me-2"></i> Главная
@@ -128,7 +121,8 @@ const saveOrganizations = () => {
                 <span class="ml-2 font-medium">
                     доступное количество
                 </span>
-                <Button text rounded icon="pi pi-plus" class="font-bold" @click="actions.add" />
+                <Button text rounded icon="pi pi-plus" class="font-bold" @click="actions.add" v-tooltip="`Добавить`" />
+                <Button text rounded icon="pi pi-minus" v-if="consumableCount.count > 0" class="font-bold" @click="actions.subtract" severity="danger" v-tooltip="`Вычесть`" />
             </Chip>
 
             <DetailViewer class="mt-8" :items="[                    

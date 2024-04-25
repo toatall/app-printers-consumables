@@ -14,6 +14,9 @@ use Illuminate\Validation\Rule;
 class PrinterRequest extends FormRequest
 {
 
+    /**
+     * @var Printer|null
+     */
     private $_printer;
 
     /**

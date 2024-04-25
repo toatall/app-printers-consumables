@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Printer\Printer;
+use App\Models\Printer\PrinterWorkplace;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Расходный материал
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * 
  * @property User $author
  * @property Printer[] $printers
+ * @property PrinterWorkplace[] $printersWorkplace
  */
 class Consumable extends Model
 {
@@ -76,6 +79,31 @@ class Consumable extends Model
     public function printers(): BelongsToMany
     {
         return $this->belongsToMany(Printer::class, 'printers_consumables', 'id_consumable', 'id_printer');        
+    }
+
+    /**
+     * Принтеры (справочник) и принтеры на рабочих местах,
+     * привязанные к текущему расходному материалу
+     * @return \Illuminate\Support\Collection
+     */
+    public function printersWorkplace()
+    {
+        return DB::table('printers_workplace')
+            ->select([
+                'printers_workplace.id',
+                'printers_workplace.location',
+                'printers_workplace.serial_number',
+                'printers_workplace.inventory_number',
+                'printers.id as id_printer',
+                'printers.vendor',
+                'printers.model',
+                'printers.is_color_print',
+            ])
+            ->join('printers', 'printers.id', '=', 'printers_workplace.id_printer')
+            ->join('printers_consumables', 'printers_consumables.id_printer', '=', 'printers.id')
+            ->where('printers_consumables.id_consumable', $this->id)
+            ->where('printers_workplace.org_code', Auth::user()->org_code)        
+            ->get();
     }
 
     /**

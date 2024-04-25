@@ -34,14 +34,13 @@ class ConsumableCountAdded extends Model
      * 
      * Сохранение данных о количестве в родительской записи 
      * с общим количеством расходных материалов
-     * При добавлении добавляется текущее количество к общему количеству в родительской записи
-     * При удалении отнимается текущее количество от общего количества в родительской записи
+     * При добавлении увеличивается текущее количество к общему количеству в родительской записи
+     * При удалении уменьшается текущее количество от общего количества в родительской записи
      * @param self $model текущий объект
-     * @param bool $isPlus (true - если добавляется, false - если удаляется) 
+     * @param bool $isPlus (true - если увеличивается, false - если уменьшается) 
      */
     private static function updateModel(self $model, bool $isPlus = true)
-    {
-        $model->id_author = Auth::user()->id;
+    {               
         $consumableCount = $model->consumableCount;
         if ($consumableCount === null) {
             throw new \Exception("Parent record ConsumableCount with id={$model->id_consumable_count} not found!");
@@ -62,13 +61,14 @@ class ConsumableCountAdded extends Model
         parent::booting();
         
         // создание объекта
-        static::created(function(self $model) {           
-            static::updateModel($model);
+        static::creating(function(self $model) { 
+            $model->id_author = Auth::user()->id;          
+            self::updateModel($model);
         });
 
         // удаление объекта
         static::deleted(function(self $model) {            
-            static::updateModel($model, false);
+            self::updateModel($model, false);
         });
     }
 

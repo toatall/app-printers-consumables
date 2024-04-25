@@ -8,11 +8,13 @@ use App\Http\Controllers\ConsumablesCountsController;
 use App\Http\Controllers\ConsumablesCountsInstalledController;
 use App\Http\Controllers\ConsumablesMoveController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dictionary\ConsumablesPrintersController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\PrintersController;
 use App\Http\Controllers\PrintersWorkplaceController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UsersOrganizationsController;
+use App\Models\Consumable\Consumable;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -84,8 +86,10 @@ Route::post('users/organizations/{organization}', [UsersOrganizationsController:
 
 
 Route::middleware('auth')->group(function() {
+
     // Printers
     Route::resource('printers/workplace', PrintersWorkplaceController::class);
+    Route::get('printers/workplace/list/{consumable}', [PrintersWorkplaceController::class, 'list']);
 
     // ConsumableCount    
     Route::resource('consumables/counts', ConsumablesCountsController::class)->only(['index', 'create', 'store', 'show', 'update']);
@@ -96,7 +100,7 @@ Route::middleware('auth')->group(function() {
     Route::get('consumables/counts/{count}/journal-installed', [ConsumablesCountsController::class, 'journalInstalled']);
     
     Route::resource('consumables.counts.added', ConsumablesCountsAddedController::class)->only(['index', 'destroy']);
-    Route::resource('consumables.counts.installed', ConsumablesCountsInstalledController::class)->only(['index', 'destroy']);
+    Route::resource('consumables.counts.installed', ConsumablesCountsInstalledController::class)->only(['index', 'store', 'destroy']);
 });
 
 // Chart

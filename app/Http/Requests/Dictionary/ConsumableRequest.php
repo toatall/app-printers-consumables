@@ -14,6 +14,9 @@ use Illuminate\Validation\Rules\RequiredIf;
  */
 class ConsumableRequest extends FormRequest
 {
+    /**
+     * @var Consumable|null
+     */
     private $_consumable;
 
     /**

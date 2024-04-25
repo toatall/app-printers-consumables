@@ -24,7 +24,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import Tooltip from 'primevue/tooltip';
 import 'primeicons/primeicons.css';
 import moment from 'moment/moment';
-import { urls } from '@/config';
+import { urls, config } from '@/config';
 
 moment.locale('ru');
 
@@ -58,7 +58,8 @@ createInertiaApp({
             .component('ConfirmDialog', ConfirmDialog)       
             .directive('tooltip', Tooltip)
             .provide('moment', moment)            
-            .provide('urls', urls)       
+            .provide('urls', urls) 
+            .provide('config', config)      
             .mount(el)
     },
 })
