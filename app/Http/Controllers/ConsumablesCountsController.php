@@ -10,6 +10,7 @@ use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountAdded;
 use App\Models\Consumable\ConsumableTypesEnum;
 use App\Models\Organization;
+use App\Models\Printer\Printer;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,32 @@ class ConsumablesCountsController extends Controller
             'consumableTypes' => ConsumableTypesEnum::array(),      
             'cartridgeColors' => CartridgeColors::get(),
         ]);
-    }        
+    }
+
+    public function listByPrinter(Printer $printer)
+    {
+        return
+        [
+            'data' => DB::table('consumables_counts')
+                ->select([
+                    'consumables_counts.id',
+                    'consumables_counts.id_consumable',
+                    'consumables_counts.count',
+                    'consumables.type',
+                    'consumables.name',
+                    'consumables.color',
+                ])
+                    ->join('consumables', 'consumables.id', '=', 'consumables_counts.id_consumable')
+                    ->join('consumables_counts_organizations', 'consumables_counts_organizations.id_consumable_count', '=', 'consumables_counts.id')
+                    ->join('printers_consumables', 'printers_consumables.id_consumable', '=', 'consumables.id')
+                    ->join('printers', 'printers.id', '=', 'printers_consumables.id_printer')
+                ->where('consumables_counts_organizations.org_code', '=', Auth::user()->org_code)
+                ->where('printers.id', '=', $printer->id)
+                ->get(),
+            'consumableTypes' => ConsumableTypesEnum::array(),
+            'cartridgeColors' => CartridgeColors::get(),
+        ];
+    }
 
     /**
      * Форма создания записи ConsumableCount

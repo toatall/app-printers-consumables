@@ -8,6 +8,7 @@ export const config = {
 
 export const urls = {
     home: '/',
+
     // пользователи
     users: {
         index: () => `/users`,
@@ -16,6 +17,7 @@ export const urls = {
             change: (id) => `/users/organizations/${id}`,
         }
     },    
+
     // принтеры
     printers: {
         base: `/printers/workplace`,
@@ -28,7 +30,9 @@ export const urls = {
         update(id) { return this.show(id) },
         delete(id) { return this.show(id) },
         list (idConsumable) { return `${this.base}/list/${idConsumable}` },
+        all() { return `${this.base}/all` },
     },
+
     // расходные материалы
     consumables: {        
         counts: {
@@ -45,6 +49,11 @@ export const urls = {
             update(id) { return this.show(id) },
             updateOrganizations(id) { return `${this.base}/${id}/update-organizations` },
 
+            installed() { return `${this.base}/installed/last` },
+            installMaster() { return `${this.base}/installed/master` },
+
+            listByPrinter(idPrinter) { return `${this.base}/list-by-printer/${idPrinter}` },
+
             // 
             journal: {
                 added: {
@@ -57,7 +66,8 @@ export const urls = {
                 },
             },                        
         },
-    },    
+    },
+
     // справочник
     dictionary: {
         prefix: 'dictionary',

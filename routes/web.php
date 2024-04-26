@@ -88,8 +88,10 @@ Route::post('users/organizations/{organization}', [UsersOrganizationsController:
 Route::middleware('auth')->group(function() {
 
     // Printers
+    Route::get('printers/workplace/all', [PrintersWorkplaceController::class, 'all']);
     Route::resource('printers/workplace', PrintersWorkplaceController::class);
     Route::get('printers/workplace/list/{consumable}', [PrintersWorkplaceController::class, 'list']);
+    
 
     // ConsumableCount    
     Route::resource('consumables/counts', ConsumablesCountsController::class)->only(['index', 'create', 'store', 'show', 'update']);
@@ -98,9 +100,12 @@ Route::middleware('auth')->group(function() {
     Route::put('consumables/counts/{count}/update-organizations', [ConsumablesCountsController::class, 'updateOrganizations']);
     Route::get('consumables/counts/{count}/journal-added', [ConsumablesCountsController::class, 'journalAdded']);
     Route::get('consumables/counts/{count}/journal-installed', [ConsumablesCountsController::class, 'journalInstalled']);
+    Route::get('consumables/counts/list-by-printer/{printer}', [ConsumablesCountsController::class, 'listByPrinter']);
     
     Route::resource('consumables.counts.added', ConsumablesCountsAddedController::class)->only(['index', 'destroy']);
     Route::resource('consumables.counts.installed', ConsumablesCountsInstalledController::class)->only(['index', 'store', 'destroy']);
+    Route::get('consumables/counts/installed/last', [ConsumablesCountsInstalledController::class, 'last']);
+    Route::get('consumables/counts/installed/master', [ConsumablesCountsInstalledController::class, 'master']);
 });
 
 // Chart

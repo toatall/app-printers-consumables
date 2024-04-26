@@ -45,13 +45,23 @@ class PrintersWorkplaceController extends Controller
 
     /**
      * Список принтеров на рабочих местах для выпадающего списка
-     * привязанных к расходному материалу $consumable
+     * привязанных к расходному материалу $consumable и к текущей организации
      * @param Consumable $consumable
      * @return \Illuminate\Support\Collection
      */
     public function list(Consumable $consumable)
     {
         return $consumable->printersWorkplace();
+    }
+
+    /**
+     * Список всех принтеров на рабочих местах для выпадающего списка
+     * привязанных к текущей организации
+     * @return \Illuminate\Support\Collection
+     */
+    public function all()
+    {
+        return PrinterWorkplace::with('printer')->where('org_code', Auth::user()->org_code)->get();
     }
 
     /**

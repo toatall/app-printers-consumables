@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ConsumableCountInstalledRequest;
+use App\Models\Consumable\CartridgeColors;
 use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountInstalled;
+use App\Models\Consumable\ConsumableTypesEnum;
+use Inertia\Inertia;
 
 class ConsumablesCountsInstalledController extends Controller
 {
@@ -21,9 +24,24 @@ class ConsumablesCountsInstalledController extends Controller
     }
 
     /**
-     * Store a newly created 
-     * 
-     * resource in storage.
+     * Последние установленные расходные материалы
+     * @return array
+     */
+    public function last()
+    {
+        return [
+            'data' => ConsumableCountInstalled::with([
+                'consumableCount' => fn($query) => $query->with('consumable'), 
+                'printerWorkplace' => fn($query) => $query->with('printer'),
+                'author',
+            ])->orderByDesc('created_at')->get(),
+            'cartridgeColors' => CartridgeColors::get(),
+            'consumableTypes' => ConsumableTypesEnum::array(),
+        ];
+    }  
+
+    /**
+     * Сохранение установленного расходного материала
      */
     public function store(Consumable $consumable, ConsumableCount $count, ConsumableCountInstalledRequest $request)
     {        

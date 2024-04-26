@@ -3,6 +3,7 @@
 namespace App\Models\Consumable;
 
 use App\Models\Auth\User;
+use App\Models\Printer\PrinterWorkplace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -12,13 +13,14 @@ use Illuminate\Support\Facades\Auth;
  * 
  * @property int $id
  * @property int $id_consumable_count
- * @property int $id_printer_workspace
+ * @property int $id_printer_workplace
  * @property int $id_author
  * @property int $count
  * @property string $created_at
  * @property string $updated_at
  * 
  * @property ConsumableCount $consumableCount
+ * @property PrinterWorkplace $printerWorkplace
  * @property User $author
  */
 class ConsumableCountInstalled extends Model
@@ -87,6 +89,15 @@ class ConsumableCountInstalled extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'id_author');
+    }
+
+    /**
+     * Принтер на рабочем месте
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function printerWorkplace()
+    {
+        return $this->belongsTo(PrinterWorkplace::class, 'id_printer_workplace');
     }
 
     /**
