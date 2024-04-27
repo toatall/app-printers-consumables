@@ -19,10 +19,8 @@ const props = defineProps({
     <div class="grid grid-cols-2 gap-5">
                 
         <LastOperationsInstalled />
-
-        <div class="bg-white rounded-lg border border-gray-100 shadow p-4">
-            <Chart />
-        </div>
+        
+        <Chart />
         
     </div>
 </template>

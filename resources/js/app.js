@@ -22,6 +22,7 @@ import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Tooltip from 'primevue/tooltip';
+import VueApexCharts from "vue3-apexcharts";
 import 'primeicons/primeicons.css';
 import moment from 'moment/moment';
 import { urls, config } from '@/config';
@@ -54,6 +55,7 @@ createInertiaApp({
             .use(ToastService)
             .use(DialogService)   
             .use(ConfirmationService)
+            .use(VueApexCharts)
             .component('DynamicDialog', DynamicDialog)       
             .component('ConfirmDialog', ConfirmDialog)       
             .directive('tooltip', Tooltip)

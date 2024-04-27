@@ -18,6 +18,14 @@ export const urls = {
         }
     },    
 
+    // графики
+    chart: {
+        base: `/chart`,
+        // добавленные и установленные расходные материалы
+        // за последние 30 дней
+        last() { return `${this.base}/last` },
+    },
+
     // принтеры
     printers: {
         base: `/printers/workplace`,

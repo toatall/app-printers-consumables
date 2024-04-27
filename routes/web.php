@@ -106,16 +106,12 @@ Route::middleware('auth')->group(function() {
     Route::resource('consumables.counts.installed', ConsumablesCountsInstalledController::class)->only(['index', 'store', 'destroy']);
     Route::get('consumables/counts/installed/last', [ConsumablesCountsInstalledController::class, 'last']);
     Route::get('consumables/counts/installed/master', [ConsumablesCountsInstalledController::class, 'master']);
+
+    // Chart
+    Route::get('chart/last', [ChartController::class, 'last']);
 });
 
-// Chart
-
-// Route::get('chart', [ChartController::class, 'index'])
-//     //->middleware('role:reader,editor-stock,editor-local,admin');
-//     ->middleware('auth');
-
 // Images
-
 Route::get('/img/{path}', [ImagesController::class, 'show'])
     ->where('path', '.*')
     ->name('image');

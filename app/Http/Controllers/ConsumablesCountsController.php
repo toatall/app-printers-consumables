@@ -50,11 +50,17 @@ class ConsumablesCountsController extends Controller
         ]);
     }
 
+    /**
+     * Список расходных материалов связанных с принтером $printer
+     * и текущей организацией
+     * @param Printer $printer
+     * @return array
+     */
     public function listByPrinter(Printer $printer)
     {
         return
         [
-            'data' => DB::table('consumables_counts')
+            'data' => DB::table('consumables_counts')                
                 ->select([
                     'consumables_counts.id',
                     'consumables_counts.id_consumable',
@@ -62,12 +68,13 @@ class ConsumablesCountsController extends Controller
                     'consumables.type',
                     'consumables.name',
                     'consumables.color',
-                ])
+                ])->distinct()                
                     ->join('consumables', 'consumables.id', '=', 'consumables_counts.id_consumable')
                     ->join('consumables_counts_organizations', 'consumables_counts_organizations.id_consumable_count', '=', 'consumables_counts.id')
                     ->join('printers_consumables', 'printers_consumables.id_consumable', '=', 'consumables.id')
                     ->join('printers', 'printers.id', '=', 'printers_consumables.id_printer')
-                ->where('consumables_counts_organizations.org_code', '=', Auth::user()->org_code)
+                    ->join('printers_workplace', 'printers_workplace.id_printer', '=', 'printers.id')
+                ->where('printers_workplace.org_code', '=', Auth::user()->org_code)
                 ->where('printers.id', '=', $printer->id)
                 ->get(),
             'consumableTypes' => ConsumableTypesEnum::array(),

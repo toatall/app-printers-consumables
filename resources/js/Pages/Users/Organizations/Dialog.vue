@@ -46,7 +46,10 @@ const change = (code, event) => {
     if (code !== selectedOrganization.value) {
         saving.value = true
         Inertia.post(urls.users.organizations.change(code), {}, {
-            onFinish: () => dialogClose(),            
+            onFinish: () => {
+                dialogClose()                
+                Inertia.get(window.location.href)
+            }
         })
     }
 }

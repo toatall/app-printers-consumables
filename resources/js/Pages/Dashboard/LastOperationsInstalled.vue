@@ -1,19 +1,21 @@
 <script setup>
 import axios from 'axios';
-import { defineAsyncComponent, inject, onMounted, ref } from 'vue';
-import ProgressSpinner from 'primevue/progressspinner';
+import { defineAsyncComponent, inject, onMounted, reactive, ref } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import TableTitle from '@/Shared/TableTitle';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import { useDialog } from 'primevue/usedialog';
+import { useToast } from 'primevue/usetoast';
 
 const urls = inject('urls')
+const config = inject('config')
 const moment = inject('moment')
 const dataTable = ref()
 const loading = ref(false)
 const dialog = useDialog()
+const toast = reactive(useToast())
 let cartridgeColors = null
 let consumableTypes = null
 
@@ -28,17 +30,23 @@ onMounted(() => {
             }
         })
         .catch((error) => {
-
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: error.message,
+                life: config.toast.timeLife,
+            })
+            console.error(error)
         })
         .finally(() => loading.value = false)
 
 })
 const title = `Установленные расходные материалы`
 
-const MasterDialog = defineAsyncComponent(() => import('@/Pages/Consumable/MasterDialog.vue'))
+const InstalledDialog = defineAsyncComponent(() => import('@/Pages/Consumable/InstalledDialog.vue'))
 
-const btnMasterDialog = () => {    
-    dialog.open(MasterDialog, {
+const btnInstalledDialog = () => {    
+    dialog.open(InstalledDialog, {
         props: {
             header: 'Взять расходный материал',
             style: {
@@ -52,73 +60,69 @@ const btnMasterDialog = () => {
         },
     })
 }
+const fieldPrinter = (item) => {
+    return `${item.printer_workplace.printer.vendor} ${item.printer_workplace.printer.model}`
+}
 
 
 </script>
-<template>
-    <div class="flex content-center bg-white" v-if="loading">
-        <ProgressSpinner />
-    </div>
-    <div v-else>
-        <DataTable :value="dataTable" paginator :rows="10" dataKey="id" class="w-full rounded shadow">
-            <template #header>
-                <div class="flex justify-between">
-                    <TableTitle>{{ title }}</TableTitle>
-                    <Button label="Взять расходный материал" severity="info" size="small" @click="btnMasterDialog" />
+<template>    
+    <DataTable :value="dataTable" :loading="loading" paginator :rows="3" dataKey="id" class="w-full rounded shadow h-[30rem] bg-white">
+        <template #header>
+            <div class="flex justify-between">
+                <TableTitle>{{ title }}</TableTitle>
+                <Button label="Расходный материал" icon="pi pi-minus-circle" severity="danger" size="small" @click="btnInstalledDialog" />
+            </div>
+        </template>
+        <Column header="Расходный материал" sortable field="count">
+            <template #body="{ data }">
+                <div class="grid grid-rows-2 gap-2">
+                    <div class="text-nowrap">
+                        <Badge :value="data.count" severity="success" v-tooltip="`Количество`"></Badge>
+                        {{ consumableTypes[data.consumable_count.consumable.type] }}
+                        {{ data.consumable_count.consumable.name }}
+                    </div>
+                    <div v-if="data.consumable_count.consumable.type == 'cartridge'">
+                        <div class="flex">
+                            <div :class="['rounded-full', 'size-4', 'mr-2', cartridgeColors[data.consumable_count.consumable.color]['bg']]"></div>
+                            <div>
+                                {{ cartridgeColors[data.consumable_count.consumable.color]['name'] }}
+                            </div>
+                        </div>   
+                    </div>                        
                 </div>
             </template>
-
-            <Column header="Расходный материал">
-                <template #body="{ data }">
-                    <div class="grid grid-rows-2 gap-2">
-                        <div class="text-nowrap">
-                            <Badge :value="data.count" severity="success" v-tooltip="`Количество`"></Badge>
-                            {{ consumableTypes[data.consumable_count.consumable.type] }}
-                            {{ data.consumable_count.consumable.name }}
-                        </div>
-                        <div v-if="data.consumable_count.consumable.type == 'cartridge'">
-                            <div class="flex">
-                                <div :class="['rounded-full', 'size-4', 'mr-2', cartridgeColors[data.consumable_count.consumable.color]['bg']]"></div>
-                                <div>
-                                    {{ cartridgeColors[data.consumable_count.consumable.color]['name'] }}
-                                </div>
-                            </div>   
-                        </div>                        
+        </Column>
+        <Column header="Принтер" :field="fieldPrinter" sortable>
+            <template #body="{ data }">
+                <div 
+                    class="grid grid-rows-2 gap-2" 
+                    v-tooltip="`Серийный номер: ${data.printer_workplace.serial_number}, инвентарный номер: ${data.printer_workplace.inventory_number}`"
+                    placeholder="Bottom"
+                >
+                    <div class="text-nowrap">
+                        <i class="pi pi-print"></i>
+                        {{ data.printer_workplace.printer.vendor }}
+                        {{ data.printer_workplace.printer.model }}
                     </div>
-                </template>
-            </Column>
-            <Column header="Принтер">
-                <template #body="{ data }">
-                    <div 
-                        class="grid grid-rows-2 gap-2" 
-                        v-tooltip="`Серийный номер: ${data.printer_workplace.serial_number}, инвентарный номер: ${data.printer_workplace.inventory_number}`"
-                        placeholder="Bottom"
-                    >
-                        <div class="text-nowrap">
-                            <i class="pi pi-print"></i>
-                            {{ data.printer_workplace.printer.vendor }}
-                            {{ data.printer_workplace.printer.model }}
-                        </div>
-                        <div>
-                            {{ data.printer_workplace.location }} кабинет
-                        </div>
+                    <div>
+                        {{ data.printer_workplace.location }} кабинет
                     </div>
-                </template>
-            </Column>
-            <Column header="Исполнитель">
-                <template #body="{ data }">
-                    {{ data.author?.fio ?? data.author.name }}
-                </template>
-            </Column>
-            <Column header="Дата">
-                <template #body="{ data }">
-                    <div class="grid">
-                        <div>{{ moment(data.created_at).fromNow() }}</div>
-                        <div>{{ moment(data.created_at).format('LLLL') }}</div>
-                    </div>
-                </template>
-            </Column>
-
-        </DataTable>
-    </div>
+                </div>
+            </template>
+        </Column>
+        <Column header="Исполнитель">
+            <template #body="{ data }">
+                {{ data.author?.fio ?? data.author.name }}
+            </template>
+        </Column>
+        <Column header="Дата" field="created_at" sortable>
+            <template #body="{ data }">
+                <div class="grid gap-y-2">
+                    <div>{{ moment(data.created_at).fromNow() }}</div>
+                    <div>{{ moment(data.created_at).format('LLLL') }}</div>
+                </div>
+            </template>
+        </Column>
+    </DataTable>    
 </template>

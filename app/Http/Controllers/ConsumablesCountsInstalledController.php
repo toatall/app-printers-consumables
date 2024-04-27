@@ -8,6 +8,7 @@ use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountInstalled;
 use App\Models\Consumable\ConsumableTypesEnum;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ConsumablesCountsInstalledController extends Controller
@@ -27,14 +28,17 @@ class ConsumablesCountsInstalledController extends Controller
      * Последние установленные расходные материалы
      * @return array
      */
-    public function last()
+    public function last($limit = 30)
     {
         return [
             'data' => ConsumableCountInstalled::with([
                 'consumableCount' => fn($query) => $query->with('consumable'), 
                 'printerWorkplace' => fn($query) => $query->with('printer'),
                 'author',
-            ])->orderByDesc('created_at')->get(),
+            ])                
+                ->whereHas('printerWorkplace', fn($query) => $query->where('org_code', Auth::user()->org_code))
+                ->limit($limit)
+                ->orderByDesc('created_at')->get(),
             'cartridgeColors' => CartridgeColors::get(),
             'consumableTypes' => ConsumableTypesEnum::array(),
         ];

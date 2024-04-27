@@ -10,6 +10,7 @@ import IconColorPrint from '@/Shared/IconColorPrint'
 import { useToast } from 'primevue/usetoast';
 import InputNumber from 'primevue/inputnumber';
 import Message from 'primevue/message';
+import { Inertia } from '@inertiajs/inertia';
 
 const urls = inject('urls')
 const config = inject('config')
@@ -129,6 +130,7 @@ const save = () => {
     form.post(urls.consumables.counts.subtract(idConsumable, idConsumableCount), {
         onSuccess: () => {
             dialogRef.value.close()
+            Inertia.get(window.location.href)
         },
     })
 }
@@ -150,7 +152,7 @@ watch(
 <template>
     <form @submit.prevent="save">       
         <div class="grid gap-y-5">                        
-            <div class="grid grid-cols-none gap-x-6 gap-y-8">                
+            <div class="grid grid-cols-none gap-x-6">                
                 <Label for="id_printer_workplace">Выберите принтер</Label>                 
                 <Dropdown 
                     :invalid="form.errors?.id_printer_workplace != null"
