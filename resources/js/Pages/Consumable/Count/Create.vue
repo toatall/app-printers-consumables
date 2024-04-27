@@ -45,7 +45,7 @@ const changeOrganization = ref(form.changeOrganization)
 const consumableData = ref()
 const consumableFind = ref(false)
 
-// поиск документа с уже выбранным расходным материалом
+// поиск документа с таким жа расходным материалом и текущей организацией
 const findConsumable = () => {
     consumableFind.value = false
     form.changeOrganization = false
@@ -65,9 +65,8 @@ const findConsumable = () => {
 
 // валидация формы 
 const validateForm = () => {    
-    form.post(urls.consumables.counts.validate(step.value), {
+    form.post(urls.consumables.counts.validate(), {
         onSuccess: () => {            
-
             if (step.value == 0) {
                 // поиск документа с уже выбранным расходным материалом
                 findConsumable() 
@@ -75,7 +74,6 @@ const validateForm = () => {
             else {
                 step.value++                
             }
-
         }
     })
 }
@@ -90,7 +88,7 @@ const prev = () => {
     step.value--
 }
 
-// шаги степпера
+// шаги мастера
 const items = ref([
     { label: 'Выбор расходного материала' },    
     { label: 'Перечень организаций' },

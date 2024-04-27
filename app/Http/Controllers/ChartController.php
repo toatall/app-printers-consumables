@@ -34,7 +34,7 @@ FROM (
     (
         SELECT
             date("consumables_counts_added"."created_at") AS "date",
-            count("consumables_counts_added"."id") AS "count"
+            SUM("consumables_counts_added"."id") AS "count"
         FROM "consumables_counts_added"
         WHERE EXISTS (
             SELECT * FROM "consumables_counts"
@@ -49,7 +49,7 @@ FROM (
     FULL JOIN (
         SELECT
             date("consumables_counts_installed"."created_at") AS "date",
-            count("consumables_counts_installed"."id") AS "count"
+            SUM("consumables_counts_installed"."id") AS "count"
         FROM "consumables_counts_installed"
         WHERE EXISTS (
             SELECT * FROM "consumables_counts"

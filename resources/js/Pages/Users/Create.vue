@@ -7,17 +7,20 @@ import Panel from 'primevue/panel'
 import Label from '@/Shared/Label'
 import InputText from 'primevue/inputtext'
 import InlineMessage from 'primevue/inlinemessage'
+import { inject } from 'vue'
 
 defineOptions({
     layout: Layout
 })
+
+const urls = inject('urls')
 
 const form = useForm({
     name: null,   
 })
 
 const save = () => {
-    form.post(`/users`)
+    form.post(urls.users.store())
 }
 
 </script>
@@ -27,8 +30,8 @@ const save = () => {
 
         <Head title="Добавление пользователя" />
 
-        <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-            { label: 'Пользователи', url: '/users' },
+        <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
+            { label: 'Пользователи', url: urls.users.index() },
             { label: form.name }
         ]" />
 

@@ -7,10 +7,10 @@ import Panel from 'primevue/panel'
 import FileUpload from 'primevue/fileupload'
 import { Inertia } from '@inertiajs/inertia'
 import Checkbox from 'primevue/checkbox'
-import { ref, watch, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import Menu from 'primevue/menu'
 import ProgressSpinner from 'primevue/progressspinner'
-import LoadingButton from '@/Shared/LoadingButton'
+import Button from 'primevue/button'
 
 const props = defineProps({
     user: Object,
@@ -23,6 +23,8 @@ const props = defineProps({
 defineOptions({
     layout: Layout
 })
+
+const urls = inject('urls')
 
 const user = props.user
 const userRoles = Array.from(Object.values(props.user.roles), (key) => key.name)
@@ -45,10 +47,10 @@ const form = useForm({
     selectedRoles: userRoles,
     selectedOrganizations: userOrganizations,    
 })
-
+const title = `${user.fio ?? ''} (${user.name})`
 
 function update() {
-    form.post(`/users/${user.id}`, {
+    form.post(urls.users.update(user.id), {
         onSuccess: () => {
             form.reset('password', 'photo')
         },
@@ -58,15 +60,15 @@ function update() {
 }
 const destroy = () => {
     if (confirm('Вы уверены, что хотите удалить данного пользователя?')) {
-        form.delete(`/users/${user.id}`, {
-            onSuccess: () => Inertia.get(`/users/${user.id}/edit`)
+        form.delete(urls.users.delete(user.id), {
+            onSuccess: () => Inertia.get(urls.users.edit(user.id))
         })
     }
 }
 const restore = () => {
     if (confirm('Вы уверены, что хотите восстановить данного пользователя?')) {
-        form.put(`/users/${user.id}/restore`, {
-            onSuccess: () => Inertia.get(`/users/${user.id}/edit`)
+        form.put(urls.users.restore(user.id), {
+            onSuccess: () => Inertia.get(urls.users.edit(user.id))
         })
     }
 }
@@ -83,15 +85,14 @@ const isAdmin = computed(() => {
 <template>    
 
     <div>
-        <Head :title="`${user.fio ?? ''} (${user.name})`" />
+        <Head :title="title" />
         
-        <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-            { label: 'Пользователи', url: '/users' },
+        <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
+            { label: 'Пользователи', url: urls.users.index() },
             { label: form.name }
         ]" />
         
-        <trashed-message v-if="user.deleted_at" class="mb-6 text-lg" @restore="restore"> Пользователь был удален.
-        </trashed-message>
+        <trashed-message v-if="user.deleted_at" class="mb-6 text-lg" @restore="restore"> Пользователь был удален. </trashed-message>
 
         <Panel>
 
@@ -220,7 +221,7 @@ const isAdmin = computed(() => {
                 </template>
 
                 <div class="flex mb-6" v-if="form.isDirty">
-                    <loading-button :loading="form.processing" class="font-bold" type="button" @click="update">Сохранить</loading-button>
+                    <Button :loading="form.processing" class="font-bold" type="button" @click="update" label="Сохранить" />
                 </div>
 
             </div>            

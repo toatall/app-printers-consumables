@@ -121,14 +121,7 @@ const onRowSelect = (event) => {
                     </div>
                 </template>
             </Column>
-            <Column field="author.email" header="Автор" />
-            <!-- <Column header="">
-                <template #body="{ data }">
-                    <Link :href="urls.dictionary.consumables.printers.replace('{id}', data.id)">
-                        <Button type="button" outlined>Привязка к принтерам</Button>
-                    </Link>
-                </template>
-            </Column> -->
+            <Column field="author.email" header="Автор" />           
 
             <template #empty> Нет данных </template>
         </DataTable>       

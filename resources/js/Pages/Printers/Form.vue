@@ -4,7 +4,7 @@ import InlineMessage from 'primevue/inlinemessage'
 import Label from '@/Shared/Label'
 import { inject, reactive } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
-import LoadingButton from '@/Shared/LoadingButton'
+import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 
 const props = defineProps({    
@@ -23,7 +23,7 @@ const form = useForm({
     inventory_number: printerWorkplace.inventory_number,    
 })
 const isNew = printerWorkplace.id === null
-function save() {    
+const save = () => {    
     if (isNew) {
         form.post(urls.printers.store())
     }
@@ -90,7 +90,7 @@ function save() {
             </div>            
 
             <div class="flex items-center justify-between p-5 bg-gray-50 border-t border-gray-100 w-full">
-                <loading-button :loading="form.processing" class="font-bold" type="submit">Сохранить</loading-button>
+                <Button :loading="form.processing" class="font-bold" type="submit" label="Сохранить" />
             </div>
 
         </div>

@@ -3,7 +3,7 @@ import { useForm } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
-import LoadingButton from '@/Shared/LoadingButton'
+import Button from 'primevue/button'
 import { reactive, computed, inject } from 'vue'
 import Label from '@/Shared/Label'
 import Textarea from 'primevue/textarea'
@@ -134,7 +134,7 @@ const save = () => {
             </div>           
             
             <div class="flex items-center justify-between p-5 py-4 bg-gray-50 border-t border-gray-100 w-full">
-                <loading-button :loading="form.processing" class="font-bold" type="submit">Сохранить</loading-button>                
+                <Button :loading="form.processing" class="font-bold" type="submit" label="Сохранить" />                
             </div>
 
         </div>

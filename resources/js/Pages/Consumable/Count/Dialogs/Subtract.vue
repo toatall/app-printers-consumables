@@ -35,6 +35,9 @@ const form = useForm({
     count: 1,
 })
 
+/**
+ * загрузка списка принтеров, привязанных к текущему расходному материалу
+ */
 onMounted(() => {
     loading.value = true
     axios.get(urls.printers.list(dialogRef.value.data.idConsumable))

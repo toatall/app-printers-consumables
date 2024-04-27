@@ -34,7 +34,7 @@ const onRowSelect = (event) => {
     
     <Head :title="title" />
 
-    <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
+    <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
         { label: 'Справочники' },
         { label: title },
     ]" />

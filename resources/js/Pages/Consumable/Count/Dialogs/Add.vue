@@ -1,10 +1,10 @@
 <script setup>
-import { useForm } from '@inertiajs/inertia-vue3'
-import { inject } from 'vue'
-import InputNumber from 'primevue/inputnumber'
-import InlineMessage from 'primevue/inlinemessage'
-import Label from '@/Shared/Label'
-import LoadingButton from '@/Shared/LoadingButton'
+import { useForm } from '@inertiajs/inertia-vue3';
+import { inject } from 'vue';
+import InputNumber from 'primevue/inputnumber';
+import InlineMessage from 'primevue/inlinemessage';
+import Label from '@/Shared/Label';
+import Button from 'primevue/button';
 
 const urls = inject('urls')
 const dialogRef = inject('dialogRef')
@@ -15,7 +15,7 @@ const form = useForm({
     count: 1,
     selectedOrganizations: [dialogRef.value.data.organizations],
 })
-function save() {        
+const save = () => {        
     form.put(urls.consumables.counts.update(dialogRef.value.data.id), {
         onSuccess: () => {
             dialogRef.value.close()
@@ -27,7 +27,6 @@ function save() {
 
 <template>
     <form @submit.prevent="save">
-        
         <div class="grid gap-x-6 gap-y-8">
             <div>
                 <Label for="count">{{ consumableCountLabels.count }}</Label>
@@ -40,10 +39,8 @@ function save() {
                 <InlineMessage v-if="form.errors?.count" class="mt-2" severity="error">{{ form.errors?.count }}</InlineMessage>
             </div>
         </div>
-
         <div class="flex items-center justify-between pt-5 w-full">
-            <loading-button :loading="form.processing" class="font-bold" type="submit">Сохранить</loading-button>
+            <Button :loading="form.processing" class="font-bold" type="submit" label="Сохранить" />
         </div>
-
     </form>
 </template>

@@ -4,7 +4,6 @@ import InlineMessage from 'primevue/inlinemessage'
 import Label from '@/Shared/Label'
 import { inject, reactive } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
-import LoadingButton from '@/Shared/LoadingButton'
 import Button from 'primevue/button'
 import { Inertia } from '@inertiajs/inertia'
 import { useConfirm } from "primevue/useconfirm";
@@ -76,7 +75,7 @@ const destroy = () => {
             </div>            
 
             <div class="flex items-center justify-between p-5 bg-gray-50 border-t border-gray-100 w-full">
-                <loading-button :loading="form.processing" class="font-bold" type="submit">Сохранить</loading-button>
+                <Button :loading="form.processing" class="font-bold" type="submit" label="Сохранить" />
                 <Button v-if="!props.isNew" severity="danger" class="font-bold" type="button" @click="destroy">                    
                     Удалить
                 </Button>

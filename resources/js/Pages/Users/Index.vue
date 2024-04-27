@@ -4,7 +4,7 @@ import pickBy from 'lodash/pickBy'
 import Layout from '@/Shared/Layout'
 import throttle from 'lodash/throttle'
 import Tag from 'primevue/tag'
-import { reactive, ref, watch } from 'vue'
+import { inject, reactive, ref, watch } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { onMounted } from 'vue'
 import { initFlowbite } from 'flowbite'
@@ -30,6 +30,8 @@ defineOptions({
 })
 const filters = reactive(props.filters)
 
+const urls = inject('urls')
+
 const form = reactive({
     search: filters.search,
     role: filters.role,
@@ -39,7 +41,7 @@ const form = reactive({
 watch(
     () => form,
     throttle(() => {
-        Inertia.get('/users', pickBy(form), { preserveState: true })
+        Inertia.get(urls.users.index(), pickBy(form), { preserveState: true })
     }, 150),
     { deep: true }
 )
@@ -49,20 +51,22 @@ onMounted(() => {
 })
 
 const create = () => {
-    Inertia.get(`/users/create`)
+    Inertia.get(urls.users.create())
 }
 
 const onRowSelect = (event) => {
-    Inertia.get(`users/${event.data.id}/edit`)
+    Inertia.get(urls.users.edit(event.data.id))
 }
+
+const title = 'Пользователи'
 
 </script>
 <template>
     <div>
-        <Head title="Пользователи" />
+        <Head :title="title" />
 
-        <Breadcrumbs :home="{ label: 'Главная', url: '/' }" :items="[
-            { label: 'Пользователи' },
+        <Breadcrumbs :home="{ label: 'Главная', url: urls.home }" :items="[
+            { label: title },
         ]" />
 
         <div class="flex justify-stretch bg-white rounded-md shadow overflow-hidden mt-4">
