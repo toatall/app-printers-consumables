@@ -6,8 +6,11 @@ export class Auth {
 
     can (...roles) {        
         for(let i=0; i<roles.length; i++) {
-            return this.roles.indexOf(roles[i]) !== -1;
+            if (this.roles.indexOf(roles[i]) >= 0) {
+                return true;
+            }
         }
+        return false;
     }    
 
 }
