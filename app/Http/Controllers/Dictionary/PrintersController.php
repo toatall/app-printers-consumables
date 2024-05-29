@@ -111,7 +111,8 @@ class PrintersController extends Controller
     {
         return Inertia::render('Dictionary/Printers/Edit', [
             'printer' => $printer->toArray(),
-            'labels' => Printer::labels(),            
+            'labels' => Printer::labels(),           
+            'manufacturers' => $this->manufacturersList(), 
         ]);
     }
 
