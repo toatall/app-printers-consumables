@@ -78,11 +78,11 @@ onMounted(() => {
     updateChart()
 })
 
-setInterval(() => {
-    if (!document.hidden) {
-        updateChart();
-    }
-}, 60000);
+// setInterval(() => {
+//     if (!document.hidden) {
+//         updateChart();
+//     }
+// }, 60000);
 
 </script>
 <template>

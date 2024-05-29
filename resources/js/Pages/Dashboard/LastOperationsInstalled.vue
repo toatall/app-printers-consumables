@@ -50,11 +50,11 @@ onMounted(() => {
     updateData();
 })
 
-setInterval(() => {
-    if (!document.hidden) {
-        updateData();
-    }
-}, 60000);
+// setInterval(() => {
+//     if (!document.hidden) {
+//         updateData();
+//     }
+// }, 60000);
 
 const title = `Установленные расходные материалы`;
 
