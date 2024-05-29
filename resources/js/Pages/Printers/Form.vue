@@ -11,9 +11,9 @@ const props = defineProps({
     labels: Object,
     printers: Object,
     printerWorkplace: Object,
-})
-const urls = inject('urls')
-const printerWorkplace = reactive(props.printerWorkplace)
+});
+const urls = inject('urls');
+const printerWorkplace = reactive(props.printerWorkplace);
 
 const form = useForm({
     id: printerWorkplace.id,
@@ -21,8 +21,8 @@ const form = useForm({
     location: printerWorkplace.location,
     serial_number: printerWorkplace.serial_number,
     inventory_number: printerWorkplace.inventory_number,    
-})
-const isNew = printerWorkplace.id === null
+});
+const isNew = printerWorkplace.id === null;
 const save = () => {    
     if (isNew) {
         form.post(urls.printers.store())
@@ -30,7 +30,7 @@ const save = () => {
     else {
         form.put(urls.printers.update(printerWorkplace.id))
     }
-}
+};
 
 </script>
 <template>

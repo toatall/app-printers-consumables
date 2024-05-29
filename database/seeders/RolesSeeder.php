@@ -3,26 +3,55 @@
 namespace Database\Seeders;
 
 use App\Models\Auth\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class RolesSeeder extends Seeder
+/**
+ * Создание ролей
+ */
+class RolesSeeder extends AbstractSeeder
 {
-    private function dateNow() 
-    {
-        return DB::raw('NOW()');
-    }
 
     /**
      * Run the database seeds.
+     * @return void
      */
     public function run(): void
     {
         Role::query()->insert([
-            ['name' => 'admin', 'created_at' => $this->dateNow(), 'updated_at' => $this->dateNow()],
-            ['name' => 'editor', 'created_at' => $this->dateNow(), 'updated_at' => $this->dateNow()],
-            ['name' => 'dictionary-moderator', 'created_at' => $this->dateNow(), 'updated_at' => $this->dateNow()],
+            // полные права (управление пользователями, ролями, справочником организаций)
+            [
+                'name' => 'admin', 
+                'description' => 'Администратор (по всему контексту)', 
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],            
+            // права для работы со справочниками (управление справочниками принтеров, расходных материалов)
+            [
+                'name' => 'editor-dictionary', 
+                'description' => 'Редактор справочников (принтеров, расходных материалов)', 
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],
+            // права на добавление принтеров на местах
+            [
+                'name' => 'editor-printer-workplace', 
+                'description' => 'Редактор принтеров на местах',
+                'created_at' => $this->getDbNowDate(),
+                'updated_at' => $this->getDbNowDate(),
+            ],
+            // права на добавление расходных материалов (количества)
+            [
+                'name' => 'add-consumables', 
+                'description' => 'Добавление расходных материалов',
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],
+            // права на вычитание расходного материала (количества)
+            [
+                'name' => 'subtract-consumable', 
+                'description' => 'Вычитание расходных материалов',
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],
         ]);
     }
 }

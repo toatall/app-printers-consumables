@@ -14,7 +14,7 @@ const props = defineProps({
     isNew: Boolean,
     labels: Object,
     printer: Object,
-})
+});
 const printer = reactive(props.printer);
 const urls = inject('urls');
 const confirm = useConfirm();
@@ -23,26 +23,26 @@ const form = useForm({
     vendor: printer.vendor,
     model: printer.model,
     is_color_print: printer.is_color_print,    
-})
+});
 
 const save = () => {    
     if (props.isNew) {
-        form.post(urls.dictionary.printers.index())
+        form.post(urls.dictionary.printers.index());
     }
     else {
-        form.put(urls.dictionary.printers.update(printer.id))
+        form.put(urls.dictionary.printers.update(printer.id));
     }
-}
+};
 
 const destroy = () => {   
     confirm.require({
         message: 'Вы уверены, что хотите удалить?',
         header: 'Удаление',
         accept: () => {
-            Inertia.delete(urls.dictionary.printers.delete(printer.id))
+            Inertia.delete(urls.dictionary.printers.delete(printer.id));
         },
     })    
-}
+};
 
 </script>
 <template>

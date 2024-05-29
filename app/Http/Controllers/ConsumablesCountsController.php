@@ -19,6 +19,12 @@ use Inertia\Inertia;
 class ConsumablesCountsController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('role:admin,add-consumables')->only(['store']);
+        $this->middleware('role:admin,subtract-consumable')->only(['update']);
+    }
+
     /**
      * Поиск всех расходных материалов (для списка)
      * @use ConsumablesCountsController::index()
@@ -214,7 +220,7 @@ class ConsumablesCountsController extends Controller
     public function update(ConsumableCountRequest $request, ConsumableCount $count)
     {       
         DB::beginTransaction();
-        
+       
         // создание модели ConsumableCountAdded с добавляемым количеством count
         $consumableCountAdded = new ConsumableCountAdded([
             'id_consumable_count' => $count->id,

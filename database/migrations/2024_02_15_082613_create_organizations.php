@@ -21,9 +21,9 @@ return new class extends Migration
             $table->unique(['code', 'name']);
         });
 
-        Schema::table('users', function(Blueprint $table) {
-            $table->foreign('org_code')->references('code')->on('organizations')->cascadeOnUpdate();
-        });
+        // Schema::table('users', function(Blueprint $table) {
+        //     $table->foreign('org_code')->references('code')->on('organizations')->cascadeOnUpdate();
+        // });
     }
 
     /**
@@ -31,9 +31,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function(Blueprint $table) {
-            $table->dropForeignIdFor(App\Models\Auth\User::class, 'org_code');
-        });
+        // Schema::table('users', function(Blueprint $table) {
+        //     $table->dropForeignIdFor(App\Models\Auth\User::class, 'org_code');
+        // });
 
         Schema::dropIfExists('organizations');
     }

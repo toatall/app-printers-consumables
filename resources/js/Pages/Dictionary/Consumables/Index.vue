@@ -17,38 +17,38 @@ const props = defineProps({
     labels: Object,
     filters: Object,
     consumableTypes: Object,
-    cartridgeColors: Object,
-    canGlobal: Object,   
-})
+    cartridgeColors: Object,    
+});
 
 defineOptions({
     layout: Layout
-})
+});
 
-const title = 'Расходные материалы (справочник)' 
-const urls = inject('urls')
-const moment = inject('moment')
+const title = 'Расходные материалы (справочник)';
+const urls = inject('urls');
+const moment = inject('moment');
+const auth = inject('auth');
 
-const selectedRow = ref()
-const consumableTypes = ref(props.consumableTypes)
-const cartridgeColors = ref(props.cartridgeColors)
-const labels = ref(props.labels)
-const filters = reactive(props.filters)
+const selectedRow = ref();
+const consumableTypes = ref(props.consumableTypes);
+const cartridgeColors = ref(props.cartridgeColors);
+const labels = ref(props.labels);
+const filters = reactive(props.filters);
 const form = reactive({
     search: filters.search,
-})
+});
 
 watch(
     () => form,
     throttle(() => {
-        Inertia.get(urls.dictionary.consumables.index(), pickBy(form), { preserveState: true })
+        Inertia.get(urls.dictionary.consumables.index(), pickBy(form), { preserveState: true });
     }, 150),
     { deep: true }
-)
+);
 
 const onRowSelect = (event) => {
-    Inertia.get(urls.dictionary.consumables.show(event.data.id))
-}
+    Inertia.get(urls.dictionary.consumables.show(event.data.id));
+};
 
 </script>
 <template>
@@ -69,7 +69,7 @@ const onRowSelect = (event) => {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="urls.dictionary.consumables.create()" v-if="canGlobal.editorStock">
+                    <Link :href="urls.dictionary.consumables.create()" v-if="auth.can('admin', 'editor-dictionary')">
                         <Button type="button" severity="info">Добавить расходный материал</Button>
                     </Link>
                     <div v-else></div>                    

@@ -9,6 +9,15 @@ use App\Models\Consumable\ConsumableCountAdded;
 
 class ConsumablesCountsAddedController extends Controller
 {
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct()
+    {
+        $this->middleware('role:admin')->only(['destroy']);
+    }
+
     /**
      * Список количества добавленных расходных материалов
      * @param Consumable $consumable расходный материал

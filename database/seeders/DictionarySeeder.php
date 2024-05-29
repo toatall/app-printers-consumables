@@ -3,24 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\Auth\User;
-use App\Models\Dictionary\Consumable\Consumable;
-use App\Models\Dictionary\Consumable\ConsumableTypesEnum;
-use App\Models\Dictionary\Printer\Printer;
-use Illuminate\Database\Seeder;
+use App\Models\Consumable\Consumable;
+use App\Models\Printer\Printer;
 use Illuminate\Support\Facades\DB;
 
-class DictionarySeeder extends Seeder
+class DictionarySeeder extends AbstractSeeder
 {
 
     private function getIdAuthor()
     {        
         return User::first()->id;
-    }
-
-    private function getDbNowDate()
-    {
-        return DB::raw('NOW()');
-    }
+    }    
 
     /**
      * Run the database seeds.
@@ -104,12 +97,11 @@ class DictionarySeeder extends Seeder
                 'updated_at' => $dbNow,
             ],
         ]);
-
         
         $consumableXerox1 = Consumable::firstWhere('name', '106R03765');
         $consumableXerox2 = Consumable::firstWhere('name', '106R03767');
         $consumableXerox3 = Consumable::firstWhere('name', '113R00782');
-        $consumableHP = Consumable::firstWhere('name', 'W2070A');        
+        $consumableHP = Consumable::firstWhere('name', 'W2070A');
         
         $printerXerox->consumables()->attach($consumableXerox1->id, ['id_author' => $idAuthor]);
         $printerXerox->consumables()->attach($consumableXerox2->id, ['id_author' => $idAuthor]);

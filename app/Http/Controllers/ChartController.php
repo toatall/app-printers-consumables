@@ -11,6 +11,63 @@ use Illuminate\Support\Facades\DB;
 class ChartController extends Controller
 {    
 
+
+    /**
+     * @param int $limit
+     * @return array
+     */
+    public function lastAdded(int $limit = 30)
+    {
+        $query = <<<SQL
+        SELECT
+            date("consumables_counts_added"."created_at") AS "date",
+            SUM("consumables_counts_added"."count") AS "count"
+        FROM "consumables_counts_added"
+        WHERE EXISTS (
+            SELECT * FROM "consumables_counts"
+            INNER JOIN "consumables_counts_organizations" ON "consumables_counts_organizations"."id_consumable_count" = "consumables_counts"."id"
+            WHERE "consumables_counts"."id" = "consumables_counts_added"."id_consumable_count"
+                AND "consumables_counts_organizations"."org_code" = :org
+        )
+        GROUP BY date("consumables_counts_added"."created_at")
+        ORDER BY date("consumables_counts_added"."created_at")
+        LIMIT :limit
+        SQL;
+
+        return DB::select($query, [
+            ':org' => Auth::user()->org_code,
+            ':limit' => $limit,
+        ]);
+    }
+
+    public function lastInstalled(int $limit = 30)
+    {
+        $query = <<<SQL
+        SELECT
+            date("consumables_counts_installed"."created_at") AS "date",
+            SUM("consumables_counts_installed"."count") AS "count"
+        FROM "consumables_counts_installed"
+        WHERE EXISTS (
+            SELECT * FROM "consumables_counts"
+                INNER JOIN "printers_consumables" ON "printers_consumables"."id_consumable" = "consumables_counts"."id_consumable"
+                INNER JOIN "printers_workplace" ON "printers_workplace"."id_printer" = "printers_consumables"."id_printer"	
+            WHERE "consumables_counts"."id" = "consumables_counts_installed"."id_consumable_count"
+                AND "printers_workplace"."org_code" = :org
+        )
+        GROUP BY date("consumables_counts_installed"."created_at")
+        ORDER BY date("consumables_counts_installed"."created_at")
+        LIMIT :limit
+        SQL;
+
+        return DB::select($query, [
+            ':org' => Auth::user()->org_code,
+            ':limit' => $limit,
+        ]);
+    }
+
+    
+
+
     /**
      * Массив с количеством добавленных 
      * и установленных расходных материалов

@@ -12,28 +12,28 @@ import InputNumber from 'primevue/inputnumber';
 import IconColorPrint from '@/Shared/IconColorPrint.vue';
 import Button from 'primevue/button';
 
-const urls = inject('urls')
-const config = inject('config')
-const dialogRef = inject('dialogRef')
-const toast = reactive(useToast())
+const urls = inject('urls');
+const config = inject('config');
+const dialogRef = inject('dialogRef');
+const toast = reactive(useToast());
 
-const printersWorkplaces = ref()
-const selectedPrinter = ref()
-const loading = ref(false)
-const isEmpty = ref(false)
+const printersWorkplaces = ref();
+const selectedPrinter = ref();
+const loading = ref(false);
+const isEmpty = ref(false);
 
 watch(
     () => selectedPrinter.value,
     (item) => {
         form.id_printer_workplace = item?.id    
     }
-)
+);
 
 const form = useForm({   
     id_consumable_count: dialogRef.value.data.idConsumableCount,
     id_printer_workplace: null,
     count: 1,
-})
+});
 
 /**
  * загрузка списка принтеров, привязанных к текущему расходному материалу
@@ -74,7 +74,7 @@ onMounted(() => {
             console.error(error)
         })  
         .finally(() => loading.value = false)
-})
+});
 
 const save = () => {            
     const idConsumable = dialogRef.value.data.idConsumable
@@ -84,7 +84,7 @@ const save = () => {
             dialogRef.value.close()
         },
     })
-}
+};
 
 </script>
 <template>

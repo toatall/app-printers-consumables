@@ -58,6 +58,18 @@ export const urls = {
          * @uses @\Pages\Dashboard\Chart.vue 
          */
         last() { return `${this.base}/last` },
+
+        /**
+         * Добавленные расходные материалы за период
+         * @uses @\Pages\Dashboard\ChartAdded.vue 
+         */
+        lastAdded() { return `${this.base}/last-added` },
+
+        /**
+         * Установленные расходные материалы за период
+         * @uses @\Pages\Dashboard\ChartInstalled.vue 
+         */
+        lastInstalled() { return `${this.base}/last-installed` },
     },
 
     // принтеры на рабочих местах

@@ -18,14 +18,14 @@ const props = defineProps({
     printerLabels: Object,
     printerWorkplaceLabels: Object,
     filters: Object,    
-    canGlobal: Object,
-})
+});
 
 defineOptions({
     layout: Layout
-})
-const urls = inject('urls')
-const moment = inject('moment')
+});
+const urls = inject('urls');
+const moment = inject('moment');
+const auth = inject('auth');
 
 onMounted(() => {
     initFlowbite()
@@ -46,12 +46,12 @@ watch(
 )
 
 
-const title = 'Принтеры'
+const title = 'Принтеры';
 
 const actions = {
     create: () => Inertia.get(urls.printers.create()),
     show: (event) => Inertia.get(urls.printers.show(event.data.id)),
-}
+};
 </script>
 <template>
     
@@ -71,7 +71,7 @@ const actions = {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Button @click="actions.create" v-if="canGlobal.editorStock" severity="info">
+                    <Button @click="actions.create" v-if="auth.can('admin', 'editor-printer-workplace')" severity="info">
                         Добавить принтер
                     </Button>                    
                     <div v-else></div>                    

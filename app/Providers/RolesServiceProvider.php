@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Role;
+use App\Models\Auth\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,8 +24,8 @@ class RolesServiceProvider extends ServiceProvider
         try {
             Role::query()->get()->map(function(Role $role) {
                 Gate::define($role->name, function($user) use ($role) {
-                    /** @var \App\Models\User $user */
-                    /** @var \App\Models\Role $role */
+                    /** @var \App\Models\Auth\User $user */
+                    /** @var \App\Models\Auth\Role $role */
                     return $user->hasRole($role->name);
                 });
             });

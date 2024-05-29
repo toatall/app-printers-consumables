@@ -7,19 +7,19 @@ import Form from './Form'
 
 defineOptions({
     layout: Layout
-})
+});
 
 const props = defineProps({
     printer: Object,
     labels: Object,    
-})
-const labels = ref(props.labels)
+});
+const labels = ref(props.labels);
 const title = computed({
     get() { 
-        return props.printer.vendor + ' ' + props.printer.model
+        return props.printer.vendor + ' ' + props.printer.model;
     }
-})
-const urls = inject('urls')
+});
+const urls = inject('urls');
 </script>
 <template>
     

@@ -16,6 +16,17 @@ use Inertia\Inertia;
  */
 class PrintersController extends Controller
 {
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct()    
+    {
+        // настройка прав доступа
+        $this->middleware('role:admin,editor-dictionary')
+            ->only(['create', 'store', 'edit', 'update', 'destroy']);
+    }
+
     /**
      * Список принтеров
      * @return \Inertia\Response

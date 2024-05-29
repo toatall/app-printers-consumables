@@ -17,17 +17,17 @@ import Message from 'primevue/message'
 
 defineOptions({
     layout: Layout
-})
+});
 const props = defineProps({
     auth: Object,
     consumables: Array,
     consumableCountLabels: Object,
     availableOrganizations: Array,    
-})
-const urls = inject('urls')
-const title = 'Добавление'
+});
+const urls = inject('urls');
+const title = 'Добавление';
 
-const step = ref(0)
+const step = ref(0);
 
 const form = useForm({   
     id_consumable: null,
@@ -35,15 +35,15 @@ const form = useForm({
     selectedOrganizations: [props.auth.user.org_code],
     changeOrganization: false,
     step: step,
-})
+});
 
 const save = () => {
     form.post(urls.consumables.counts.store())    
-}
+};
 
-const changeOrganization = ref(form.changeOrganization)
-const consumableData = ref()
-const consumableFind = ref(false)
+const changeOrganization = ref(form.changeOrganization);
+const consumableData = ref();
+const consumableFind = ref(false);
 
 // поиск документа с таким жа расходным материалом и текущей организацией
 const findConsumable = () => {
@@ -61,7 +61,7 @@ const findConsumable = () => {
             console.log(error)
         })
         .finally(() => step.value++)
-}
+};
 
 // валидация формы 
 const validateForm = () => {    
@@ -76,24 +76,24 @@ const validateForm = () => {
             }
         }
     })
-}
+};
 
 // кнопка "Далее"
 const next = () => {
     validateForm()
-}
+};
 
 // кнопка "Назад"
 const prev = () => {
     step.value--
-}
+};
 
 // шаги мастера
 const items = ref([
     { label: 'Выбор расходного материала' },    
     { label: 'Перечень организаций' },
     { label: 'Количество' },
-])
+]);
 </script>
 <template>
 

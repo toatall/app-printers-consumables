@@ -21,6 +21,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            $table->unique(['type', 'name']);
+
             $table->foreign('id_author')->references('id')->on('users');
         });
 

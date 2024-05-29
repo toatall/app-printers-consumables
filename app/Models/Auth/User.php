@@ -53,6 +53,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'org_code',
     ];
 
     /**
@@ -109,12 +110,7 @@ class User extends Authenticatable
                 ->leftJoin('roles', 'roles.id', '=', 'roles_users.id_role')
                 ->where('roles.name', $role);
         });
-    }
-
-    // public function resolveRouteBinding($value, $field = null)
-    // {
-    //     return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
-    // }
+    }   
 
     public function availableOrganizations()
     {
@@ -125,8 +121,8 @@ class User extends Authenticatable
     }
 
     public function changeSelectedOrganization($code)
-    {
-        $this->org_code = $code;
+    {        
+        $this->org_code = $code;        
         $this->save();
     }
 

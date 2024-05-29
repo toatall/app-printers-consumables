@@ -2,48 +2,37 @@
 
 namespace App\Models\Auth;
 
-use App\Models\User;
+use App\Models\Auth\User;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 
-class UserChecker
+class UserFactory
 {
-    /**
-     * @var \App\Models\Auth\LdapFinder
-     */
-    private LdapFinder $ldapFinder;
 
     /**
      * @param LdapFinder $ldapFinder
      */
-    public function __construct(LdapFinder $ldapFinder)
-    {
-        $this->ldapFinder = $ldapFinder;
-    }
+    public function __construct(private LdapFinder $ldapFinder)
+    { }
 
     public function checkUser(string $username)
-    {
+    {        
         return $this->ldapFinder->query('(sAMAccountName=' . $username . ')');
     }
 
     /**
-     * @param string $usernameAttr
+     * @param string $username
+     * @param string $domain
      * @return User
      */
-    public function findOrCreate(string $usernameAttr): User
+    public function findOrCreate(string $username, string $domain): User
     {
-        $userFullName = explode('\\', $usernameAttr);
-        $userName = $userFullName[1] ?? $userFullName[0];
-        $domain = $userFullName[0] ?? '.';
-        
-        $model = User::query()->where('name', $userName)->withTrashed()->first();
-        if ($model?->deleted_at) {
-            return $model;
-        }
+        $model = User::query()->where('name', '=', $username)->withTrashed()->first();
         if ($model === null) {
             $model = new User();
-            $model->name = $userName;
+            $model->name = $username;
             $model->domain = $domain;
             $model->password = Hash::make(Str::random(16));
         }
@@ -65,8 +54,14 @@ class UserChecker
         $data = $this->ldapFinder->query('(sAMAccountName=' . $user->name . ')');
         if (!$data) {                        
             return;
-        }        
-        $user->org_code = $user->getOrgCode();        
+        }
+        if ($user->id == null) {            
+            $orgCode = $user->getOrgCode();
+            if (Organization::find($orgCode) == null) {
+                $orgCode = '';
+            }
+            $user->org_code = $orgCode;
+        }
         $user->email = $data->getAttribute('userPrincipalName', false)[0] ?? null;
         $user->fio = $data->getAttribute('cn', false)[0] ?? null;
         $user->post = $data->getAttribute('title', false)[0] ?? null;

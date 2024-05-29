@@ -75,16 +75,7 @@ class Printer extends Model
             'updated_at' => 'Дата изменения',
             'author' => 'Автор',
         ];
-    }
-
-    // /**
-    //  * Производитель и модель
-    //  * @return string
-    //  */
-    // public function getFullNameAttribute()
-    // {
-    //     return "{$this->vendor} {$this->model}";
-    // }
+    }    
 
     /**
      * Расходные материалы привязанные к текущему принтеру

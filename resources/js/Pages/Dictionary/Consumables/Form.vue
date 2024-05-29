@@ -11,7 +11,7 @@ import InlineMessage from 'primevue/inlinemessage'
 
 defineOptions({
     layout: Layout
-})
+});
 
 const props = defineProps({
     isNew: Boolean,
@@ -19,48 +19,48 @@ const props = defineProps({
     consumableTypes: Object,   
     labels: Object,
     cartridgeColors: Object,
-})
+});
 
-const consumable = reactive(props.consumable)
-const urls = inject('urls')
+const consumable = reactive(props.consumable);
+const urls = inject('urls');
 const form = useForm({    
     type: consumable.type,
     name: consumable.name,
     color: consumable.color,
     description: consumable.description,    
-})
+});
 
 const consumableTypes = computed(() => {
-    let res = []
+    let res = [];
     Object.keys(props.consumableTypes).forEach((key) => {
         res.push({
             name: props.consumableTypes[key],
             code: key,
         })
-    })
-    return res
-})
+    });
+    return res;
+});
 
 const colors = computed(() => {
-    let res = []
+    let res = [];
     Object.keys(props.cartridgeColors).forEach((key) => {
         res.push({
             name: props.cartridgeColors[key]['name'],
             code: key,
             color: props.cartridgeColors[key]['color'],
         })
-    })
-    return res
-})
+    });
+    return res;
+});
 
 const save = () => {    
     if (props.isNew) {    
-        form.post(urls.dictionary.consumables.store())
+        form.post(urls.dictionary.consumables.store());
     }
     else {
-        form.put(urls.dictionary.consumables.update(consumable.id))
+        form.put(urls.dictionary.consumables.update(consumable.id));
     }
-}
+};
 
 </script>
 

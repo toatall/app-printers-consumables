@@ -19,7 +19,7 @@ import Dropdown from 'primevue/dropdown'
 
 defineOptions({
     layout: Layout,    
-})
+});
 const props = defineProps({
     consumablesCounts: Array,
     consumableLabels: Object,
@@ -27,16 +27,18 @@ const props = defineProps({
     filters: Object,
     consumableTypes: Object,
     cartridgeColors: Object,
-})
-const urls = inject('urls')
-const title = 'Количество расходных материалов'
-const filters = reactive(props.filters)
-const consumableLabels = props.consumableLabels
+});
+const urls = inject('urls');
+const auth = inject('auth');
+
+const title = 'Количество расходных материалов';
+const filters = reactive(props.filters);
+const consumableLabels = props.consumableLabels;
 
 const form = reactive({
     search: filters.search,
     consumableType: filters.consumableType,
-})
+});
 
 const consumableTypesDropdown = computed(() => {   
     let res = []
@@ -44,7 +46,7 @@ const consumableTypesDropdown = computed(() => {
         res.push({ value: key, name: props.consumableTypes[key] })        
     })
     return res
-})
+});
 
 watch(
     () => form,
@@ -57,7 +59,7 @@ watch(
 const actions = {
     create: () => Inertia.get(urls.consumables.counts.create()),
     show: (event) => Inertia.get(urls.consumables.counts.show(event.data.id)),
-}
+};
 
 </script>
 <template>
@@ -84,8 +86,8 @@ const actions = {
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
                     
-                    <Button severity="success" v-tooltip="`Добавить`" @click="actions.create">
-                        <i class="fas fa-circle-plus"></i>
+                    <Button v-if="auth.can('admin', 'add-consumables')" severity="info" @click="actions.create">
+                        Добавить
                     </Button>
 
                     <div class="flex">

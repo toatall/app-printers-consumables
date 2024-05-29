@@ -21,8 +21,7 @@ import Button from 'primevue/button'
 const props = defineProps({
     filters: Object,
     users: Array,
-    roles: Array,
-    rolesLabels: Object,
+    roles: Array,    
 })
 
 defineOptions({
@@ -81,7 +80,7 @@ const title = 'Пользователи'
                     <div class="flex justify-between">
                         <Button @click="create">Добавить</Button>
                         <div class="flex">
-                            <MultiSelect v-model="form.role" :options="roles" optionLabel="name" placeholder="Роли" class="w-56" />
+                            <MultiSelect v-model="form.role" :options="roles" optionValue="name" optionLabel="description" placeholder="Роли" class="w-56" />
                             <IconField iconPosition="left" class="ml-3">
                                 <InputIcon><i class="pi pi-search"></i></InputIcon>
                                 <InputText v-model="form.search" placeholder="Поиск"></InputText>
@@ -107,7 +106,7 @@ const title = 'Пользователи'
                         <ul v-if="data.roles?.length > 0">
                             <li v-for="role in data.roles"
                                 class="bg-blue-100 text-blue-800 text-sm font-medium m-2 px-2.5 py-0.5 rounded-lg">
-                                {{ props.rolesLabels[role.name] ?? role.name }}
+                                {{ role.description }}
                             </li>
                         </ul>
                         <span v-else>Нет ролей</span>

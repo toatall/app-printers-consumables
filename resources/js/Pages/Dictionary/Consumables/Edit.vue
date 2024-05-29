@@ -7,7 +7,7 @@ import Breadcrumbs from '@/Shared/Breadcrumbs'
 
 defineOptions({
     layout: Layout
-})
+});
 
 const props = defineProps({
     labels: Object,
@@ -15,11 +15,11 @@ const props = defineProps({
     cartridgeColors: Object,
     consumableTypes: Object,
     consumableTypeValue: String,
-})
-const labels = reactive(props.labels)
-const title = 'Редактирование расходного материала'
-const urls = inject('urls')
-const cartridgeColors = reactive(props.cartridgeColors)
+});
+const labels = reactive(props.labels);
+const title = 'Редактирование расходного материала';
+const urls = inject('urls');
+const cartridgeColors = reactive(props.cartridgeColors);
 
 </script>
 

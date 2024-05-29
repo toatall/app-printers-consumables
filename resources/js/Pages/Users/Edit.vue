@@ -15,29 +15,28 @@ import Button from 'primevue/button'
 const props = defineProps({
     user: Object,
     roles: Object,
-    organizations: Object,
-    canGlobal: Object,
-    rolesLabels: Object,    
-})
+    organizations: Object,    
+});
 
 defineOptions({
     layout: Layout
-})
+});
 
-const urls = inject('urls')
+const urls = inject('urls');
+const auth = inject('auth');
 
-const user = props.user
-const userRoles = Array.from(Object.values(props.user.roles), (key) => key.name)
-const userOrganizations = Array.from(Object.values(props.user.organizations), (key) => key.code)
-const menu = ref(null)
+const user = props.user;
+const userRoles = Array.from(Object.values(props.user.roles), (key) => key.name);
+const userOrganizations = Array.from(Object.values(props.user.organizations), (key) => key.code);
+const menu = ref(null);
 const menuItems = ref([
     { label: 'Удалить', icon: 'pi pi-times', visible: user.deleted_at === null, command: () => destroy() },
     { label: 'Восстановить', icon: 'pi pi-undo', visible: user.deleted_at !== null, command: () => restore() },
-])
+]);
 const toggleMenu = (event) => {
     menu.value.toggle(event)
-}
-
+};
+// форма
 const form = useForm({
     _method: 'put',
     name: user.name,
@@ -99,7 +98,7 @@ const isAdmin = computed(() => {
             <template #header>
                 <h1 class="font-bold text-xl">{{ user.fio }} ({{ user.name }})</h1>
             </template>
-            <template #icons v-if="canGlobal.admin">
+            <template #icons v-if="auth.can('admin')">
                 <button class="p-panel-icon-header p-link" @click="toggleMenu">
                     <i class="pi pi-cog"></i>
                 </button>
@@ -178,12 +177,12 @@ const isAdmin = computed(() => {
                     <div class="flex mb-6">
                         <div class="w-1/3 text-gray-500 font-semibold">Роли</div>
                         <div>
-                            <div v-if="canGlobal.admin">                                                       
+                            <div v-if="auth.can('admin')">                                                       
                                 <div v-for="role in roles" :key="role.name" class="flex items-center mt-2">
                                     <template v-if="!(isAdmin && role.name != 'admin')">
                                         <Checkbox v-model="form.selectedRoles" :inputId="role.name" name="roles" :value="role.name" />
                                         <label :for="role.name" class="ml-2 cursor-pointer">
-                                            {{ props.rolesLabels[role.name] ?? role.name }}
+                                            {{ role.description }}
                                         </label>
                                 </template>
                                 </div>                            
@@ -191,7 +190,7 @@ const isAdmin = computed(() => {
                             <div v-else>
                                 <ul>
                                     <li v-for="role in user.roles" class="mt-2">
-                                        {{ props.rolesLabels[role.name] ?? role.name }}
+                                        {{ role.description }}
                                     </li>
                                 </ul>
                             </div>
@@ -201,7 +200,7 @@ const isAdmin = computed(() => {
                     <div class="flex mb-6" v-if="!isAdmin">
                         <div class="w-1/3 text-gray-500 font-semibold">Контекст</div>
                         <div>
-                            <div v-if="canGlobal.admin">                            
+                            <div v-if="auth.can('admin')">                            
                                 <div v-for="organization in organizations" :key="organization.code" class="flex items-center mt-2">
                                     <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
                                     <label :for="organization.code" class="ml-2 cursor-pointer">

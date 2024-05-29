@@ -1,25 +1,25 @@
-# Ping CRM
+# Система учета расходных материалов
 
-A demo application to illustrate how Inertia.js works.
+Сервис 
 
 ![](https://raw.githubusercontent.com/inertiajs/pingcrm/master/screenshot.png)
 
-## Installation
+## Установка
 
-Clone the repo locally:
+Клонировать репозиторий:
 
 ```sh
-git clone https://github.com/inertiajs/pingcrm.git pingcrm
-cd pingcrm
+git clone https://github.com/totall/app-printers-consumables.git app-printers-consumables
+cd app-printers-consumables
 ```
 
-Install PHP dependencies:
+Установить PHP зависимости:
 
 ```sh
 composer install
 ```
 
-Install NPM dependencies:
+Установить NPM зависимости:
 
 ```sh
 npm ci
@@ -31,37 +31,33 @@ Build assets:
 npm run dev
 ```
 
-Setup configuration:
+Настроить файл конфигурации:
 
 ```sh
 cp .env.example .env
 ```
 
-Generate application key:
+Сгенерировать application key:
 
 ```sh
 php artisan key:generate
 ```
 
-Create an SQLite database. You can also use another database (MySQL, Postgres), simply update your configuration accordingly.
+Создать БД PostgreSQL. Настроить подключение в файле `.env`.
 
-```sh
-touch database/database.sqlite
-```
-
-Run database migrations:
+Запустить миграции:
 
 ```sh
 php artisan migrate
 ```
 
-Run database seeder:
+Запустить database seeder:
 
 ```sh
 php artisan db:seed
 ```
 
-Run the dev server (the output will give the address):
+Запустить встроенный веб-сервер:
 
 ```sh
 php artisan serve
@@ -69,8 +65,9 @@ php artisan serve
 
 You're ready to go! Visit Ping CRM in your browser, and login with:
 
-- **Username:** johndoe@example.com
+- **Username:** admin@example.com
 - **Password:** secret
+
 
 ## Running tests
 

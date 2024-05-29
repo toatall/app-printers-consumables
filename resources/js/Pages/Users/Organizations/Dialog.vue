@@ -44,7 +44,7 @@ const loadData = () => {
 
 const change = (code, event) => {
     if (code !== selectedOrganization.value) {
-        saving.value = true
+        saving.value = true;
         Inertia.post(urls.users.organizations.change(code), {}, {
             onFinish: () => {
                 dialogClose()                

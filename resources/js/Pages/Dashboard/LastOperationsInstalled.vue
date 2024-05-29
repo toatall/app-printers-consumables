@@ -9,24 +9,28 @@ import Button from 'primevue/button';
 import { useDialog } from 'primevue/usedialog';
 import { useToast } from 'primevue/usetoast';
 
-const urls = inject('urls')
-const config = inject('config')
-const moment = inject('moment')
-const dataTable = ref()
-const loading = ref(false)
-const dialog = useDialog()
-const toast = reactive(useToast())
-let cartridgeColors = null
-let consumableTypes = null
+const props = defineProps({
+    auth: Object,
+});
 
-onMounted(() => {
-    loading.value = true
+const auth = inject('auth');
+const urls = inject('urls');
+const config = inject('config');
+const moment = inject('moment');
+const dataTable = ref();
+const loading = ref(false);
+const dialog = useDialog();
+const toast = reactive(useToast());
+let cartridgeColors = null;
+let consumableTypes = null;
+
+const updateData = () => {
     axios.get(urls.consumables.counts.installed())
         .then((response) => {
             if (Array.isArray(response.data.data)) {
-                dataTable.value = response.data.data
-                cartridgeColors = response.data.cartridgeColors
-                consumableTypes = response.data.consumableTypes                
+                dataTable.value = response.data.data;
+                cartridgeColors = response.data.cartridgeColors;
+                consumableTypes = response.data.consumableTypes;              
             }
         })
         .catch((error) => {
@@ -36,14 +40,25 @@ onMounted(() => {
                 detail: error.message,
                 life: config.toast.timeLife,
             })
-            console.error(error)
+            console.error(error);
         })
-        .finally(() => loading.value = false)
+        .finally(() => loading.value = false);
+}
 
+onMounted(() => {
+    loading.value = true;
+    updateData();
 })
-const title = `Установленные расходные материалы`
 
-const InstalledDialog = defineAsyncComponent(() => import('@/Pages/Consumable/InstalledDialog.vue'))
+setInterval(() => {
+    if (!document.hidden) {
+        updateData();
+    }
+}, 60000);
+
+const title = `Установленные расходные материалы`;
+
+const InstalledDialog = defineAsyncComponent(() => import('@/Pages/Consumable/InstalledDialog.vue'));
 
 const btnInstalledDialog = () => {    
     dialog.open(InstalledDialog, {
@@ -61,7 +76,7 @@ const btnInstalledDialog = () => {
     })
 }
 const fieldPrinter = (item) => {
-    return `${item.printer_workplace.printer.vendor} ${item.printer_workplace.printer.model}`
+    return `${item.printer_workplace.printer.vendor} ${item.printer_workplace.printer.model}`;
 }
 
 
@@ -71,7 +86,14 @@ const fieldPrinter = (item) => {
         <template #header>
             <div class="flex justify-between">
                 <TableTitle>{{ title }}</TableTitle>
-                <Button label="Расходный материал" icon="pi pi-minus-circle" severity="danger" size="small" @click="btnInstalledDialog" />
+                <Button 
+                    v-if="auth.can('admin', 'subtract-consumable')"
+                    label="Вычесть расходный материал" 
+                    icon="pi pi-minus-circle" 
+                    severity="danger" 
+                    size="small" 
+                    @click="btnInstalledDialog" 
+                />
             </div>
         </template>
         <Column header="Расходный материал" sortable field="count">
@@ -100,7 +122,7 @@ const fieldPrinter = (item) => {
                     v-tooltip="`Серийный номер: ${data.printer_workplace.serial_number}, инвентарный номер: ${data.printer_workplace.inventory_number}`"
                     placeholder="Bottom"
                 >
-                    <div class="text-nowrap">
+                    <div>
                         <i class="pi pi-print"></i>
                         {{ data.printer_workplace.printer.vendor }}
                         {{ data.printer_workplace.printer.model }}

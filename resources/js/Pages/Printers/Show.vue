@@ -11,19 +11,19 @@ import DetailViewer from '@/Shared/DetailViewer'
 
 defineOptions({
     layout: Layout
-})
-const urls = inject('urls')
-const confirm = useConfirm()
+});
+const urls = inject('urls');
+const auth = inject('auth');
+const confirm = useConfirm();
 const props = defineProps({
     printerWorkplace: Object,
     printerLabels: Object,
     printerWorkplaceLabels: Object,    
-    canGlobal: Object,
-})
+});
 
-const printer = props.printerWorkplace.printer
-const printerWorkplace = props.printerWorkplace
-const printerLabels = props.printerLabels
+const printer = props.printerWorkplace.printer;
+const printerWorkplace = props.printerWorkplace;
+const printerLabels = props.printerLabels;
 
 const actions = {
     edit: () => Inertia.get(urls.printers.edit(printerWorkplace.id)),
@@ -32,8 +32,8 @@ const actions = {
         header: 'Удаление',
         accept: () => Inertia.delete(urls.printers.delete(printerWorkplace.id)),
     }),
-}
-const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})`
+};
+const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})`;
 </script>
 
 <template>
@@ -90,7 +90,7 @@ const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})
                     },
                 ]"></DetailViewer>                
 
-                <div class="flex justify-between mt-10 font-bold">
+                <div v-if="auth.can('admin', 'editor-printer-workplace')" class="flex justify-between mt-10 font-bold">
                     <Button @click="actions.edit">Редактировать</Button>
                     <Button severity="danger" @click="actions.delete">Удалить</Button>             
                 </div>

@@ -11,15 +11,19 @@ Route::prefix('dictionary')->name('dictionary.')->middleware('role:admin')->grou
 
     // принтеры
     Route::resource('printers', PrintersController::class);
-    Route::resource('printers.consumables', PrintersConsumablesController::class);
-    Route::post('/printers/{printer}/consumables/{consumable}/add', [PrintersConsumablesController::class, 'add']);
+    Route::middleware('role:admin,editor-dictionary')->group(function() {
+        Route::resource('printers.consumables', PrintersConsumablesController::class)->only(['index', 'destroy']);
+        Route::post('/printers/{printer}/consumables/{consumable}/add', [PrintersConsumablesController::class, 'add']);
+    });
 
     // Расходные материалы
     Route::resource('consumables', ConsumablesController::class);
-    Route::resource('consumables.printers', ConsumablesPrintersController::class)->only(['index', 'destroy']);
-    Route::post('/consumables/{consumable}/printers/{printer}/add', [ConsumablesPrintersController::class, 'add']);
+    Route::middleware('role:admin,editor-dictionary')->group(function() {
+        Route::resource('consumables.printers', ConsumablesPrintersController::class)->only(['index', 'destroy']);
+        Route::post('/consumables/{consumable}/printers/{printer}/add', [ConsumablesPrintersController::class, 'add']);
+    });
 
     // Организации
-    Route::resource('organizations', OrganizationsController::class);
+    Route::resource('organizations', OrganizationsController::class)->middleware('role:admin');
 
 });

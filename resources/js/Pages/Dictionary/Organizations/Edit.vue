@@ -1,24 +1,24 @@
 <script setup>
 import { Head } from '@inertiajs/inertia-vue3'
 import Layout from '@/Shared/Layout'
-import { ref, computed, inject } from 'vue'
+import { computed, inject } from 'vue'
 import Breadcrumbs from '@/Shared/Breadcrumbs'
 import Form from './Form'
 
 defineOptions({
     layout: Layout
-})
+});
 
 const props = defineProps({
     organization: Object,
     labels: Object,    
-})
+});
 const title = computed({
     get() { 
-        return `${props.organization.name} (${props.organization.code})`
+        return `${props.organization.name} (${props.organization.code})`;
     }
-})
-const urls = inject('urls')
+});
+const urls = inject('urls');
 </script>
 <template>
     

@@ -9,10 +9,19 @@ use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountInstalled;
 use App\Models\Consumable\ConsumableTypesEnum;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
 class ConsumablesCountsInstalledController extends Controller
 {
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct()
+    {
+        $this->middleware('role:admin,subtract-consumable')->only(['store']);
+        $this->middleware('role:admin')->only('destroy');
+    }
+
     /**
      * Список количества добавленных расходных материалов
      * @param Consumable $consumable расходный материал
@@ -46,6 +55,10 @@ class ConsumablesCountsInstalledController extends Controller
 
     /**
      * Сохранение установленного расходного материала
+     * @param Consumable $consumable
+     * @param ConsumableCount $count
+     * @param ConsumableCountInstalledRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Consumable $consumable, ConsumableCount $count, ConsumableCountInstalledRequest $request)
     {        

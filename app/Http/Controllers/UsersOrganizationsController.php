@@ -30,7 +30,7 @@ class UsersOrganizationsController extends Controller
      */
     public function change(Organization $organization)
     {                
-        if (Auth::user()->availableOrganizations()->where('code', $organization->code)->count()) {
+        if (Auth::user()->availableOrganizations()->where('code', $organization->code)->count() > 0) {           
             Auth::user()->changeSelectedOrganization($organization->code);
             return redirect()->back()
                 ->with('success', "Выбрана организация с кодом {$organization->code}!");       

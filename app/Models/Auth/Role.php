@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $name
+ * @property string $description
+ * 
  */
 class Role extends Model
 {
@@ -25,5 +27,6 @@ class Role extends Model
      */
     protected $fillable = [
         'name',
+        'description',
     ];
 }

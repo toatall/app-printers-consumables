@@ -4,11 +4,17 @@ import { useToast } from 'primevue/usetoast';
 import { inject, onMounted, reactive, ref } from 'vue';
 import ru from 'apexcharts/dist/locales/ru.json';
 
-const urls = inject('urls')
-const moment = inject('moment')
-const toast = reactive(useToast())
-const config = inject('config')
-const loadingChart = ref(false)
+const props = defineProps({
+    url: String,
+    header: String,
+    chartTitle: String,
+    chartBgColor: String,
+})
+
+const moment = inject('moment');
+const toast = reactive(useToast());
+const config = inject('config');
+const loadingChart = ref(false);
 const chartOptions = ref({
     chart: {
         locales: [ru],
@@ -18,51 +24,40 @@ const chartOptions = ref({
         curve: "smooth",
     },
     title: {
-        text: 'Динамика установки расходных материалов',
+        text: props.header,
     },
     xaxis: {
         type: 'date',
         labels: {
-            formatter: function (value, timestamp) {                
-                return value != null ? moment(value).format('L') : null
+            formatter: function (value, timestamp) {
+                return value != null ? moment(value).format('L') : null;
             },
         },        
     },    
-})
-const chartSeries = ref([])
+});
+const chartSeries = ref([]);
 
-onMounted(() => {
-    loadingChart.value = true
-    axios.get(urls.chart.last())
-        .then((response) => {                        
+const updateChart = () => {
+    axios.get(props.url)
+        .then((response) => {
             chartSeries.value = []
             chartOptions.value.xaxis.categories = []            
             if (Array.isArray(response.data) && response.data.length > 0) {              
                 
-                let resultDataAdded = []
-                let resultDataInstalled = []
+                let result = []
                 
                 response.data.forEach((item) => {
-                    resultDataAdded.push({
+                    result.push({
                         x: item.date,
-                        y: item.count_added,
-                    })
-                    resultDataInstalled.push({
-                        x: item.date,
-                        y: item.count_installed,
+                        y: item.count,
                     })
                 })
                 chartSeries.value.push(
                     {
-                        name: 'Установлено расходных материалов',
-                        data: resultDataInstalled,
-                        color: '#ef4444',
-                    },
-                    {
-                        name: 'Добавлено расходных материалов',
-                        data: resultDataAdded,
-                        color: '#22c55e',
-                    },
+                        name: props.chartTitle,
+                        data: result,
+                        color: props.chartBgColor,
+                    },                    
                 )
             }
         })
@@ -75,8 +70,19 @@ onMounted(() => {
             })
             console.error(error)
         })  
-        .finally(() => loadingChart.value = false)    
+        .finally(() => loadingChart.value = false) 
+}
+
+onMounted(() => {
+    loadingChart.value = true
+    updateChart()
 })
+
+setInterval(() => {
+    if (!document.hidden) {
+        updateChart();
+    }
+}, 60000);
 
 </script>
 <template>
@@ -85,7 +91,7 @@ onMounted(() => {
             <i class="fa-solid fa-circle-notch fa-spin text-gray-400 text-4xl"></i>
         </div>
         <div v-show="!loadingChart">
-            <apexchart type="bar" class="h-full" :options="chartOptions" :series="chartSeries"></apexchart>
+            <apexchart type="line" class="h-full" :options="chartOptions" :series="chartSeries"></apexchart>
         </div>
     </div>
 </template>

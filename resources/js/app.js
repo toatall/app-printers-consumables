@@ -26,7 +26,9 @@ import VueApexCharts from "vue3-apexcharts";
 import 'primeicons/primeicons.css';
 import moment from 'moment/moment';
 import { urls, config } from '@/config';
+import { Auth } from '@/auth';
 
+//
 moment.locale('ru');
 
 /* add icons to the library */
@@ -37,7 +39,7 @@ InertiaProgress.init()
 
 createInertiaApp({
     resolve: name => require(`./Pages/${name}`),
-    title: title => title,// ? `${title} - Система учета картриджей` : 'Система учета картриджей',
+    title: title => title,
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .component('font-awesome-icon', FontAwesomeIcon)
@@ -55,13 +57,14 @@ createInertiaApp({
             .use(ToastService)
             .use(DialogService)   
             .use(ConfirmationService)
-            .use(VueApexCharts)
+            .use(VueApexCharts)            
             .component('DynamicDialog', DynamicDialog)       
             .component('ConfirmDialog', ConfirmDialog)       
             .directive('tooltip', Tooltip)
             .provide('moment', moment)            
             .provide('urls', urls) 
             .provide('config', config)      
+            .provide('auth', new Auth(props.initialPage.props?.auth?.user?.roles ?? []))
             .mount(el)
     },
 })

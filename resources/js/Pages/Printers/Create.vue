@@ -7,13 +7,13 @@ import Breadcrumbs from '@/Shared/Breadcrumbs'
 
 defineOptions({
     layout: Layout
-})
-const urls = inject('urls')
+});
+const urls = inject('urls');
 const props = defineProps({
     labels: Object,
     printers: Object,
-})
-const title = 'Добавление принтера'
+});
+const title = 'Добавление принтера';
 </script>
 
 <template>

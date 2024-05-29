@@ -41,25 +41,24 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'auth' => function () use ($request) {
+                $roles = $request->user()?->roles()?->get()?->transform(fn(Role $role) => $role->name) ?? [];
                 return [
                     'user' => $request->user() ? [
                         'id' => $request->user()->id,                       
                         'name' => $request->user()->name,
-                        'email' => $request->user()->email,
-                        'roles' => $request->user()->roles()->get()->transform(fn(Role $role) => [
-                            'name' => $role->name,
-                        ]),
+                        'email' => $request->user()->email,                        
+                        'roles' => $roles,
                         'fio' => $request->user()->fio,
                         'org_code' => $request->user()->org_code,
                     ] : null,
                 ];
             },            
-            'canGlobal' => [
-                'admin' => Auth::check() && Auth::user()->hasRole('admin'),
-                'editorStock' => Auth::check() && Auth::user()->hasRole(['admin', 'editor-stock']),
-                'editorLocal' => Auth::check() && Auth::user()->hasRole(['admin', 'editor-local']),
-                'reader' => Auth::check() && Auth::user()->hasRole(['reader', 'editor-local', 'editor-stock', 'admin']),
-            ],
+            // 'canGlobal' => [
+            //     'admin' => Auth::check() && Auth::user()->hasRole('admin'),
+            //     'editorStock' => Auth::check() && Auth::user()->hasRole(['admin', 'editor-stock']),
+            //     'editorLocal' => Auth::check() && Auth::user()->hasRole(['admin', 'editor-local']),
+            //     'reader' => Auth::check() && Auth::user()->hasRole(['reader', 'editor-local', 'editor-stock', 'admin']),
+            // ],
             'flash' => function () use ($request) {
                 return [
                     'success' => $request->session()->get('success'),

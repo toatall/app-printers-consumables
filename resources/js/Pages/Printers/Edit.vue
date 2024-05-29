@@ -7,14 +7,14 @@ import Form from './Form'
 
 defineOptions({
     layout: Layout
-})
-const urls = inject('urls')
+});
+const urls = inject('urls');
 const props = defineProps({
     labels: Object,
     printers: Object,
     printerWorkplace: Object,
-})
-const title = 'Редактирование'
+});
+const title = 'Редактирование';
 
 </script>
 <template>

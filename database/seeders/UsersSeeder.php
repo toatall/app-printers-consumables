@@ -3,21 +3,26 @@
 namespace Database\Seeders;
 
 use App\Models\Auth\User;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class UsersSeeder extends Seeder
-{
+/**
+ * Создание тестовых пользователей
+ */
+class UsersSeeder extends AbstractSeeder
+{    
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $codeRegion = $this->getRegionCode();
+
         $user = new User([
             'name' => 'admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('secret'),
-            'org_code' => '0000',
+            'org_code' => "{$codeRegion}00",
         ]);
         $user->save();
         $user->updateRoles(['admin']);
@@ -26,7 +31,7 @@ class UsersSeeder extends Seeder
             'name' => 'user',
             'email' => 'user@example.com',
             'password' => Hash::make('secret'),
-            'org_code' => '0001',
+            'org_code' => "{$codeRegion}00",
         ]);
         $user2->save();
     }

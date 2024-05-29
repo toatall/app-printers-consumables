@@ -12,34 +12,34 @@ const props = defineProps({
     isNew: Boolean,
     labels: Object,
     organization: Object,
-})
-const organization = props.organization
+});
+const organization = props.organization;
 const urls = inject('urls');
 const confirm = useConfirm();
 
 const form = useForm({    
     code: organization.code,
     name: organization.name,
-})
+});
 
 const save = () => {    
     if (props.isNew) {
-        form.post(urls.dictionary.organizations.store())
+        form.post(urls.dictionary.organizations.store());
     }
     else {
-        form.put(urls.dictionary.organizations.update(organization.code))
+        form.put(urls.dictionary.organizations.update(organization.code));
     }
-}
+};
 
 const destroy = () => {   
     confirm.require({
         message: 'Вы уверены, что хотите удалить?',
         header: 'Удаление',
         accept: () => {
-            Inertia.delete(urls.dictionary.organizations.delete(organization.code))
+            Inertia.delete(urls.dictionary.organizations.delete(organization.code));
         },
-    })
-}
+    });
+};
 </script>
 <template>
     <form @submit.prevent="save">

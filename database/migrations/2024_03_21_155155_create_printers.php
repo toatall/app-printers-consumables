@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('vendor', 100);
             $table->string('model', 200);
-            $table->boolean('is_color_print')->default(false);
-            $table->unique(['vendor', 'model']);
+            $table->boolean('is_color_print')->default(false);            
             $table->integer('id_author');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['vendor', 'model']);
 
             $table->foreign('id_author')->references('id')->on('users');
         });

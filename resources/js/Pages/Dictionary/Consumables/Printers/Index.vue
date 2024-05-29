@@ -16,37 +16,36 @@ const props = defineProps({
     printers: Object,
     labels: Object,
     filters: Object,    
-    canGlobal: Object,  
     consumable: Object,    
     consumableTypeValue: String,
-})
+});
 
 defineOptions({
     layout: Layout
-})
-const consumable = props.consumable
-const title = `Привязка принтера`
-const urls = inject('urls')
+});
+const consumable = props.consumable;
+const title = `Привязка принтера`;
+const urls = inject('urls');
+const auth = inject('auth');
 
-const filters = reactive(props.filters)
+const filters = reactive(props.filters);
 
 const form = reactive({
     search: filters.search,
-})
+});
 watch(
     () => form,
     throttle(() => {
         Inertia.get(urls.dictionary.consumables.printers.index(consumable.id), pickBy(form), { preserveState: true })
     }, 150),
     { deep: true }
-)
-
+);
 
 const addPrinter = (id) => {
     Inertia.post(urls.dictionary.consumables.printers.add(consumable.id, id), {
         onSuccess: () => Inertia.get(urls.dictionary.components.show(consumable.id)),
     })
-}
+};
 
 </script>
 <template>
@@ -68,7 +67,7 @@ const addPrinter = (id) => {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="urls.dictionary.consumables.show(consumable.id)" v-if="canGlobal.editorStock">
+                    <Link :href="urls.dictionary.consumables.show(consumable.id)" v-if="auth.can('admin', 'editor-dictionary')">
                         <Button type="button" severity="secondary" outlined>
                             <i class="fas fa-chevron-circle-left me-3"></i>
                             Назад
@@ -93,7 +92,7 @@ const addPrinter = (id) => {
                     {{ data.is_color_print ? 'Да' : 'Нет' }}
                 </template>
             </Column>            
-            <Column header="">
+            <Column header="" v-if="auth.can('admin', 'editor-dictionary')">
                 <template #body="{ data }">
                     <Button @click="addPrinter(data.id)">
                         <i class="fas fa-check me-3"></i>

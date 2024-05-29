@@ -14,24 +14,25 @@ const props = defineProps({
     consumable: Object,
     consumableCount: Object,    
     isOpen: Boolean,
-})
-const urls = inject('urls')
-const moment = inject('moment')
-const toast = reactive(useToast())
-const confirm = useConfirm()
+});
+const urls = inject('urls');
+const auth = inject('auth');
+const moment = inject('moment');
+const toast = reactive(useToast());
+const confirm = useConfirm();
 
-const idConsumable = props.consumableCount.id_consumable
-const idConsumableCount = props.consumableCount.id
+const idConsumable = props.consumableCount.id_consumable;
+const idConsumableCount = props.consumableCount.id;
 
-const dataItemsAdded = ref()
-const dataItemsInstalled = ref()
+const dataItemsAdded = ref();
+const dataItemsInstalled = ref();
 
 const journalAdded = {
     loading: ref(false),
     loadingDelete: ref(false),
     idDelete: ref(0),
-}
-const journalInstalled = JSON.parse(JSON.stringify(journalAdded))
+};
+const journalInstalled = JSON.parse(JSON.stringify(journalAdded));
 
 // загрузка журнала
 const baseUpdate = (url, refObj, refParamsObj, errorTitle) => {
@@ -51,8 +52,8 @@ const baseUpdate = (url, refObj, refParamsObj, errorTitle) => {
                 life: 5000,
             })
             console.error(error)
-        })
-}
+        });
+};
 
 const updateJournalAdded = () => {        
     baseUpdate(
@@ -61,7 +62,7 @@ const updateJournalAdded = () => {
         journalAdded,
         'Ошибка загрузки журнала добавления расходных материалов',
     )
-}
+};
 const updateJournalInstalled = () => {    
     baseUpdate(
         urls.consumables.counts.journal.installed.index(idConsumable, idConsumableCount), 
@@ -69,7 +70,7 @@ const updateJournalInstalled = () => {
         journalInstalled,
         'Ошибка загрузки журнала установки расходных материалов',
     )
-}
+};
 
 const baseRedo = (url, id, refLoadingObj, fnUpdate) => {
     confirm.require({
@@ -88,7 +89,7 @@ const baseRedo = (url, id, refLoadingObj, fnUpdate) => {
             })
         },
     })
-}
+};
 
 const redoJournalAdded = (id) => {            
     baseRedo(
@@ -97,7 +98,7 @@ const redoJournalAdded = (id) => {
         journalAdded,
         updateJournalAdded
     )
-}
+};
 const redoJournalInstalled = (id) => {            
     baseRedo(
         urls.consumables.counts.journal.installed.redo(idConsumable, idConsumableCount, id),
@@ -105,12 +106,12 @@ const redoJournalInstalled = (id) => {
         journalInstalled,
         updateJournalInstalled
     )
-}
+};
 
 onMounted(() => {   
     updateJournalAdded()
     updateJournalInstalled()
-})
+});
 
 </script>
 <template>    
@@ -156,7 +157,7 @@ onMounted(() => {
                         </div>
                     </template>
                 </Column>
-                <Column header="">
+                <Column header="" v-if="auth.can('admin')">
                     <template #body="{ data }">
                         <Button 
                             v-tooltip="`Отменить`" 
@@ -214,7 +215,7 @@ onMounted(() => {
                         </div>
                     </template>
                 </Column>
-                <Column header="">
+                <Column header="" v-if="auth.can('admin')">
                     <template #body="{ data }">
                         <Button 
                             v-tooltip="`Отменить`" 

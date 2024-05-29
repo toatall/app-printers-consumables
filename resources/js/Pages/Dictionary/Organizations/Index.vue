@@ -12,23 +12,22 @@ import TableTitle from '@/Shared/TableTitle'
 const props = defineProps({
     organizations: Object,
     labels: Object,
-    filters: Object,
-    canGlobal: Object,   
-})
+    filters: Object,    
+});
 
 defineOptions({
     layout: Layout
-})
+});
 
-const title = 'Организации' 
-const urls = inject('urls')
-const moment = inject('moment')
+const title = 'Организации';
+const urls = inject('urls');
+const moment = inject('moment');
 
-const selectedRow = ref()
+const selectedRow = ref();
 
 const onRowSelect = (event) => {
-    Inertia.get(urls.dictionary.organizations.show(event.data.code))
-}
+    Inertia.get(urls.dictionary.organizations.show(event.data.code));
+};
 </script>
 <template>
     
@@ -49,7 +48,7 @@ const onRowSelect = (event) => {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="urls.dictionary.organizations.create()" v-if="canGlobal.editorStock">
+                    <Link :href="urls.dictionary.organizations.create()">
                         <Button type="button" severity="info">Добавить организацию</Button>
                     </Link>                   
                 </div>                

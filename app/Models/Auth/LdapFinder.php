@@ -1,12 +1,16 @@
 <?php
 
 namespace App\Models\Auth;
+
 use Symfony\Component\Ldap\Ldap;
 
+/**
+ * Поиск пользователя в Active Directory
+ */
 class LdapFinder
 {
     /**
-     * @var \Symfony\Component\Ldap\Ldap
+     * @var Ldap
      */
     private Ldap $connector;
 
@@ -32,7 +36,7 @@ class LdapFinder
     /**
      * @param string $host
      * @param int $port
-     * @return \Symfony\Component\Ldap\Ldap
+     * @return Ldap
      */
     private function connect(string $host, int $port): Ldap
     {
@@ -45,6 +49,7 @@ class LdapFinder
     /**
      * @param string $name
      * @param string $password
+     * @return void
      */
     private function bind(string $username, string $password)
     {

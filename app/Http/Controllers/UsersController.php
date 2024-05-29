@@ -6,7 +6,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Auth\LdapFinder;
 use App\Models\Auth\Role;
 use App\Models\Auth\User;
-use App\Models\Auth\UserChecker;
+use App\Models\Auth\UserFactory;
 use App\Models\Organization;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -21,6 +21,17 @@ class UsersController extends Controller
 {
 
     /**
+     * {@inheritDoc}
+     */
+    public function __construct()
+    {
+        // настройка прав доступа
+        $this->middleware('role:admin')
+            ->only(['create', 'store', 'destroy']);
+    }
+
+
+    /**
      * Все доступные роли
      * @return \Illuminate\Support\Collection
      */
@@ -28,6 +39,7 @@ class UsersController extends Controller
     {
         return Role::all()->transform(fn(Role $role) => [
             'name' => $role->name,
+            'description' => $role->description,
         ]);
     }
 
@@ -75,8 +87,7 @@ class UsersController extends Controller
             'users' => User::filter(Request::only(['search', 'role']))                
                 ->get()
                 ->transform($this->transformUser()),
-            'roles' => $this->roles(),
-            'rolesLabels' => User::rolesLabels(),           
+            'roles' => $this->roles(),            
         ]);
     }
 
@@ -96,7 +107,7 @@ class UsersController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $userFactory = new UserChecker(new LdapFinder(
+        $userFactory = new UserFactory(new LdapFinder(
             host: env('LDAP_SERVER_NAME'),
             port: env('LDAP_SERVER_PORT'),
             dn: env('LDAP_BASE_DN'),
@@ -106,7 +117,7 @@ class UsersController extends Controller
         if ($userFactory->checkUser($request->name) == null) {
             return Session::flash('error', "Пользователь {$request->name} не найден в ЕСК!");
         }
-        $user = $userFactory->findOrCreate("$request->name");
+        $user = $userFactory->findOrCreate("$request->name", '.');
 
         return redirect()->route('users.edit', [$user])
             ->with('success', 'Пользователь успешно создан!');
@@ -146,7 +157,7 @@ class UsersController extends Controller
             ],
             'roles' => $this->roles(),             
             'organizations' => $this->organizations(),
-            'rolesLabels' => User::rolesLabels(),           
+            //'rolesLabels' => User::rolesLabels(),           
         ]);
     }
 

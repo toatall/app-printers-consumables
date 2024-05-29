@@ -4,23 +4,24 @@ import Logo from '@/Shared/Logo'
 import Dropdown from '@/Shared/Dropdown'
 import MainMenu from '@/Shared/MainMenu'
 import FlashMessages from '@/Shared/FlashMessages'
-import { defineAsyncComponent, onMounted } from 'vue'
+import { defineAsyncComponent, inject, onMounted } from 'vue'
 import { initFlowbite } from 'flowbite'
 import Button from 'primevue/button'
 import { useDialog } from 'primevue/usedialog'
 
 const props = defineProps({
     auth: Object,
-    canGlobal: Object,
     appName: String,
 })
 
 onMounted(() => {
     initFlowbite()
-})
+});
 
-const dialog = useDialog()
-const OrganizationsDialog = defineAsyncComponent(() => import('@/Pages/Users/Organizations/Dialog.vue'))
+const urls = inject('urls');
+
+const dialog = useDialog();
+const OrganizationsDialog = defineAsyncComponent(() => import('@/Pages/Users/Organizations/Dialog.vue'));
 const openOrganizationsDialog = () => {
     const dialogRef = dialog.open(OrganizationsDialog, {
         props: {
@@ -37,8 +38,8 @@ const openOrganizationsDialog = () => {
         data: {
             'auth': props.auth,
         }
-    })  
-}
+    });
+};
 </script>
 
 <template>
@@ -94,7 +95,7 @@ const openOrganizationsDialog = () => {
                                 <template #dropdown>
                                     <div class="mt-2 py-2 text-sm bg-white rounded shadow-xl">
                                         <Link class="block px-6 py-2 hover:text-white hover:bg-indigo-500"
-                                            :href="`/users/${auth.user.id}/edit`">Профиль</Link>                                    
+                                            :href="urls.users.edit(auth.user.id)">Профиль</Link>
                                         <Link class="block px-6 py-2 w-full text-left hover:text-white hover:bg-indigo-500"
                                             href="/logout" method="delete" as="button">Выход</Link>
                                     </div>

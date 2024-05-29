@@ -20,7 +20,7 @@ import Panel from 'primevue/panel'
 
 defineOptions({
     layout: Layout
-})
+});
 const props = defineProps({
     consumableCount: Object,
     consumable: Object,
@@ -29,13 +29,15 @@ const props = defineProps({
     organizations: Array,
     organizationLabels: Object,
     allOrganizations: Array,
-})
-const urls = inject('urls')
-const title = props.consumableTitle
-const consumableCountLabels = props.consumableCountLabels
-const dialog = useDialog()
-const AddDialog = defineAsyncComponent(() => import('./Dialogs/Add.vue'))
-const SubtractDialog = defineAsyncComponent(() => import('./Dialogs/Subtract.vue'))
+});
+
+const urls = inject('urls');
+const auth = inject('auth');
+const title = props.consumableTitle;
+const consumableCountLabels = props.consumableCountLabels;
+const dialog = useDialog();
+const AddDialog = defineAsyncComponent(() => import('./Dialogs/Add.vue'));
+const SubtractDialog = defineAsyncComponent(() => import('./Dialogs/Subtract.vue'));
 
 const actions = {    
     add: () => {        
@@ -78,23 +80,23 @@ const actions = {
             }
         }) 
     },
-}
+};
 
 const bgColor = computed(() => props.consumableCount.count <= 1 ? 'bg-red-500' : 
     (props.consumableCount.count < 10 ? 'bg-yellow-500' : 'bg-primary-500') 
-)
+);
 
-const visibleOrganizationsEdit = ref(false)
+const visibleOrganizationsEdit = ref(false);
 const form = useForm({
     id_consumable: props.consumable.id,
     count: 1,
     selectedOrganizations: Array.from(props.organizations).map((item) => item.code),
-})
+});
 const saveOrganizations = () => {
     form.put(urls.consumables.counts.updateOrganizations(props.consumableCount.id), {
         onSuccess: () => visibleOrganizationsEdit.value = false
     })
-}
+};
 
 </script>
 <template>
@@ -113,7 +115,7 @@ const saveOrganizations = () => {
             </template>
             <Chip class="pl-0 pr-3">
                 <span 
-                    class="font-bold text-2xl text-surface-0 rounded-full w-12 h-12 flex items-center justify-center"
+                    class="font-bold text-lg text-surface-0 rounded-full w-12 h-12 flex items-center justify-center"
                     :class="bgColor"
                 >
                     {{ consumableCount.count }}
@@ -121,8 +123,21 @@ const saveOrganizations = () => {
                 <span class="ml-2 font-medium">
                     доступное количество
                 </span>
-                <Button text rounded icon="pi pi-plus" class="font-bold" @click="actions.add" v-tooltip="`Добавить`" />
-                <Button text rounded icon="pi pi-minus" v-if="consumableCount.count > 0" class="font-bold" @click="actions.subtract" severity="danger" v-tooltip="`Вычесть`" />
+                <Button 
+                    v-if="auth.can('admin', 'add-consumables')" 
+                    text rounded icon="pi pi-plus" 
+                    class="font-bold" 
+                    @click="actions.add" 
+                    v-tooltip="`Добавить`" 
+                />
+                <Button 
+                    v-if="auth.can('admin', 'subtract-consumable') && consumableCount.count > 0" 
+                    text rounded icon="pi pi-minus"                    
+                    class="font-bold" 
+                    @click="actions.subtract" 
+                    severity="danger" 
+                    v-tooltip="`Вычесть`" 
+                />
             </Chip>
 
             <DetailViewer class="mt-8" :items="[                    
@@ -183,7 +198,7 @@ const saveOrganizations = () => {
                 selectionMode="single"
                 v-else
             >          
-                <template #header>
+                <template #header v-if="auth.can('admin', 'add-consumables')">
                     <Button severity="success" @click="visibleOrganizationsEdit = true" size="small" label="Редактировать" />                        
                 </template>      
 

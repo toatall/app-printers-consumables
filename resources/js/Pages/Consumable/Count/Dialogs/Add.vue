@@ -6,22 +6,22 @@ import InlineMessage from 'primevue/inlinemessage';
 import Label from '@/Shared/Label';
 import Button from 'primevue/button';
 
-const urls = inject('urls')
-const dialogRef = inject('dialogRef')
-const consumableCountLabels = dialogRef.value.data.consumableCountLabels
+const urls = inject('urls');
+const dialogRef = inject('dialogRef');
+const consumableCountLabels = dialogRef.value.data.consumableCountLabels;
 
 const form = useForm({   
     id_consumable: dialogRef.value.data.idConsumable,
     count: 1,
     selectedOrganizations: [dialogRef.value.data.organizations],
-})
+});
 const save = () => {        
     form.put(urls.consumables.counts.update(dialogRef.value.data.id), {
         onSuccess: () => {
             dialogRef.value.close()
         },
     })    
-}
+};
 
 </script>
 

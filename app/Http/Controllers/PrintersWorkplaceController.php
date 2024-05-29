@@ -17,6 +17,19 @@ class PrintersWorkplaceController extends Controller
 {
 
     /**
+     * {@inheritDoc}
+     */
+    public function __construct()
+    {
+        // настройка прав доступа
+        $this->middleware('role:admin,editor-printer-workplace')
+            ->only(['create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('role:admin,subtract-consumable')
+            ->only(['list']);
+    }
+
+
+    /**
      * Все принтеры (из справочника)
      * Для использования в выпадающем списке (dropdown)
      * @return \Illuminate\Support\Collection

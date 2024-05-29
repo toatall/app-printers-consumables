@@ -7,14 +7,14 @@ import Breadcrumbs from '@/Shared/Breadcrumbs'
 
 defineOptions({
     layout: Layout
-})
+});
 
 const props = defineProps({
     labels: Object,
-})
-const labels = reactive(props.labels)
-const title = 'Добавление принтера'
-const urls = inject('urls')
+});
+const labels = reactive(props.labels);
+const title = 'Добавление принтера';
+const urls = inject('urls');
 
 </script>
 

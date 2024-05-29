@@ -1,22 +1,22 @@
 <script setup>
-import { Link } from '@inertiajs/inertia-vue3'
-import { usePage } from '@inertiajs/inertia-vue3'
-import { computed, inject } from 'vue'
+import { Link } from '@inertiajs/inertia-vue3';
+import { usePage } from '@inertiajs/inertia-vue3';
+import { inject } from 'vue';
 
-const page = usePage()
-const can = computed(() => page.props.value.canGlobal)
-const urls = inject('urls')
+const page = usePage();
+const urls = inject('urls');
+const auth = inject('auth');
 
 const isUrl = (...urls) => {    
-    let currentUrl = page.url.value    
+    let currentUrl = page.url.value;
     if (urls[0] === '/') {
         return currentUrl === '/'
     }
-    return urls.filter((url) => currentUrl.startsWith(url)).length
-}
-const classIsActive = `text-white`
-const classIsInactive = `text-indigo-300 group-hover:text-white`
-const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-indigo-700 group`
+    return urls.filter((url) => currentUrl.startsWith(url)).length;
+};
+const classIsActive = `text-white`;
+const classIsInactive = `text-indigo-300 group-hover:text-white`;
+const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-indigo-700 group`;
 
 </script>
 <template>    
@@ -29,7 +29,7 @@ const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-in
                 </Link>
             </li>
 
-            <li v-if="can.admin">
+            <li v-if="auth.can('admin')">
                 <Link :href="urls.users.index()" :class="[isUrl(urls.users.index()) ? classIsActive : classIsInactive, classLink]">
                     <i class="fas fa-user me-3 w-5 h-5"></i>
                     Пользователи
@@ -51,14 +51,14 @@ const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-in
             </li>
             
             <li>
-                <button type="button" :class="[`w-full text-indigo-300 transition duration-75`, classLink]" aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">                  
+                <button type="button" :class="[`w-full text-indigo-300 transition duration-75`, classLink]" aria-controls="dropdown-menu-dictionary" data-collapse-toggle="dropdown-menu-dictionary">                  
                     <i class="fas fa-cube me-3 w-5 h-5"></i>
                     <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Справочники</span>
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                     </svg>
                 </button>
-                <ul id="dropdown-example" class="hidden py-2 space-y-2">
+                <ul id="dropdown-menu-dictionary" class="hidden py-2 space-y-2">
                     <li>
                         <Link :href="urls.dictionary.printers.index()" :class="[isUrl(urls.dictionary.printers.index()) ? classIsActive : classIsInactive, classLink, 'pl-11']">
                             <i class="fas fa-print me-3 w-5 h-5"></i>
@@ -71,7 +71,7 @@ const classLink = `flex items-center p-2 rounded-lg hover:bg-white hover:text-in
                             Расходные материалы
                         </Link>
                     </li>
-                    <li>
+                    <li v-if="auth.can('admin')">
                         <Link :href="urls.dictionary.organizations.index()" :class="[isUrl(urls.dictionary.organizations.index()) ? classIsActive : classIsInactive, classLink, 'pl-11']">
                             <i class="fa-solid fa-sitemap me-3 w-5 h-5"></i>
                             Организации

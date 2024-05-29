@@ -13,7 +13,7 @@ import TableTitle from '@/Shared/TableTitle';
 
 defineOptions({
     layout: Layout,
-})
+});
 
 const props = defineProps({
     consumable: Object,
@@ -24,20 +24,21 @@ const props = defineProps({
     printers: Object,
     printersNotIn: Object,
     printerLabels: Object,
-})
+});
 
-const urls = inject('urls')
-const moment = inject('moment')
-const consumable = props.consumable
-const consumableLabels = props.consumableLabels
-const cartridgeColors = props.cartridgeColors
-const confirm = useConfirm()
+const urls = inject('urls');
+const moment = inject('moment');
+const auth = inject('auth');
+const consumable = props.consumable;
+const consumableLabels = props.consumableLabels;
+const cartridgeColors = props.cartridgeColors;
+const confirm = useConfirm();
 
-const title = `${props.consumableTypeValue} ${consumable.name}`
+const title = `${props.consumableTypeValue} ${consumable.name}`;
 
 const createRelation = () => {
-    Inertia.get(urls.dictionary.consumables.printers.index(consumable.id))
-}
+    Inertia.get(urls.dictionary.consumables.printers.index(consumable.id));
+};
 
 const deleteRelation = (id) => {
     confirm.require({
@@ -47,9 +48,9 @@ const deleteRelation = (id) => {
             Inertia.delete(urls.dictionary.consumables.printers.delete(consumable.id, id))
         },
     })    
-}
+};
 
-const goToEdit = () => Inertia.get(urls.dictionary.consumables.edit(consumable.id))
+const goToEdit = () => Inertia.get(urls.dictionary.consumables.edit(consumable.id));
 const deleteConsumable = () => {
     confirm.require({
         message: 'Вы уверены, что хотите удалить запись?',
@@ -58,7 +59,7 @@ const deleteConsumable = () => {
             Inertia.delete(urls.dictionary.consumables.delete(consumable.id))
         },
     })    
-}
+};
 
 </script>
 <template>
@@ -127,7 +128,7 @@ const deleteConsumable = () => {
                 </tr>
             </table>
 
-            <div class="flex justify-between mt-10">
+            <div class="flex justify-between mt-10" v-if="auth.can('admin', 'editor-dictionary')">
                 <Button class="font-bold" @click="goToEdit">Редактировать</Button>
                 <Button severity="danger" class="font-bold" @click="deleteConsumable">Удалить</Button>
             </div>
@@ -140,7 +141,9 @@ const deleteConsumable = () => {
                 <template #header>
                     <TableTitle class="border-b border-gray-200 pb-2">Привязки к принтерам</TableTitle>
                     <div class="flex justify-between mt-5">
-                        <Button type="button" severity="info" @click="createRelation">Добавить привязку к принтеру</Button>                        
+                        <Button v-if="auth.can('admin', 'editor-dictionary')" type="button" severity="info" @click="createRelation">
+                            Добавить привязку к принтеру
+                        </Button>                        
                     </div>                
                 </template>
 
@@ -156,7 +159,7 @@ const deleteConsumable = () => {
                         {{ data.is_color_print ? 'Да' : 'Нет' }}
                     </template>
                 </Column>
-                <Column header="">
+                <Column header="" v-if="auth.can('admin', 'editor-dictionary')">
                     <template #body="{ data }">                                                 
                         <Button severity="danger" type="button" v-tooltip="`Удалить привязку`" @click="deleteRelation(data.id)">
                             <i class="fas fa-times"></i>

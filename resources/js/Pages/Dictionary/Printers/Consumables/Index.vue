@@ -15,39 +15,38 @@ import throttle from 'lodash/throttle'
 const props = defineProps({
     printer: Object,
     filters: Object,    
-    canGlobal: Object,  
     consumables: Object,    
     consumableTypes: Object,
     consumableLabels: Object,
     cartridgeColors: Object,
-})
+});
 
 defineOptions({
     layout: Layout
-})
-const printer = props.printer
-const title = `Привязка расходного материала`
-const urls = inject('urls')
-const consumableLabels = props.consumableLabels
-const filters = reactive(props.filters)
+});
+const printer = props.printer;
+const title = `Привязка расходного материала`;
+const urls = inject('urls');
+const auth = inject('auth');
+const consumableLabels = props.consumableLabels;
+const filters = reactive(props.filters);
 
 const form = reactive({
     search: filters.search,
-})
+});
 watch(
     () => form,
     throttle(() => {
-        Inertia.get(urls.dictionary.printers.consumables.index(printer.id), pickBy(form), { preserveState: true })
+        Inertia.get(urls.dictionary.printers.consumables.index(printer.id), pickBy(form), { preserveState: true });
     }, 150),
     { deep: true }
-)
-
+);
 
 const addConsumable = (id) => {
     Inertia.post(urls.dictionary.printers.consumables.add(printer.id, id), {
         onSuccess: () => Inertia.get(urls.dictionary.printers.show(printer.id)),
     })
-}
+};
 
 </script>
 <template>
@@ -69,13 +68,12 @@ const addConsumable = (id) => {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="urls.dictionary.printers.show(printer.id)" v-if="canGlobal.editorStock">
+                    <Link :href="urls.dictionary.printers.show(printer.id)">
                         <Button type="button" severity="secondary" outlined>
                             <i class="fas fa-chevron-circle-left me-3"></i>
                             Назад
                         </Button>
-                    </Link>
-                    <div v-else></div>                    
+                    </Link>                                       
                     <span class="relative">
                         <i class="fas fa-search absolute top-2/4 -mt-2 left-3 text-surface-400"></i>
                         <InputText v-model="form.search" placeholder="Поиск" class="pl-10 font-normal"/>
@@ -110,7 +108,7 @@ const addConsumable = (id) => {
                 </template>
                 </Column>
             <Column header="">
-                <template #body="{ data }">
+                <template #body="{ data }" v-if="auth.can('admin', 'editor-dictionary')">
                     <Button @click="addConsumable(data.id)">
                         <i class="fas fa-check me-3"></i>
                         Выбрать

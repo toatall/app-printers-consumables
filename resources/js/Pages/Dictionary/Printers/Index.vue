@@ -15,35 +15,35 @@ import throttle from 'lodash/throttle'
 const props = defineProps({
     printers: Object,
     labels: Object,
-    filters: Object,
-    canGlobal: Object,   
+    filters: Object,    
 })
 
 defineOptions({
     layout: Layout
 })
 
-const title = 'Принтеры (справочник)' 
-const urls = inject('urls')
-const moment = inject('moment')
+const title = 'Принтеры (справочник)';
+const urls = inject('urls');
+const moment = inject('moment');
+const auth = inject('auth');
 
-const selectedRow = ref()
-const filters = reactive(props.filters)
+const selectedRow = ref();
+const filters = reactive(props.filters);
 const form = reactive({
     search: filters.search,
-})
+});
 
 watch(
     () => form,
     throttle(() => {
-        Inertia.get(urls.dictionary.printers.index(), pickBy(form), { preserveState: true })
+        Inertia.get(urls.dictionary.printers.index(), pickBy(form), { preserveState: true });
     }, 150),
     { deep: true }
-)
+);
 
 const onRowSelect = (event) => {
-    Inertia.get(urls.dictionary.printers.show(event.data.id))
-}
+    Inertia.get(urls.dictionary.printers.show(event.data.id));
+};
 
 </script>
 <template>
@@ -64,7 +64,7 @@ const onRowSelect = (event) => {
             <template #header>
                 <TableTitle class="border-b border-gray-200 pb-2">{{ title }}</TableTitle>
                 <div class="flex justify-between mt-5">
-                    <Link :href="urls.dictionary.printers.create()" v-if="canGlobal.editorStock">
+                    <Link :href="urls.dictionary.printers.create()" v-if="auth.can('admin', 'editor-dictionary')">
                         <Button type="button" severity="info">Добавить принтер</Button>
                     </Link>
                     <div v-else></div>                    
@@ -101,55 +101,7 @@ const onRowSelect = (event) => {
                 </template>
             </Column>
             <Column field="author.email" header="Автор" />
-
-            <!-- <Column field="full_name" header="Принтер" style="min-width: 200px">
-                <template #body="slotProps">
-                    <div class="flex align-items-center gap-2">                       
-                        <span>{{ slotProps.data.full_name }}</span>         
-                        <div v-if="slotProps.data.color_print" v-tooltip="'Цветная печать'">        
-                            <svg                                 
-                                version="1.1" xmlns="http://www.w3.org/2000/svg" 
-                                xmlns:xlink="http://www.w3.org/1999/xlink" 
-                                viewBox="0 0 512 512" xml:space="preserve" fill="#000000"
-                                class="h-4 w-4"
-                                >                               
-                                <g> 
-                                    <circle style="fill:#EA348B;" cx="156.775" cy="341.5" r="156.775"></circle>
-                                    <circle style="fill:#FFDA44;" cx="355.225" cy="341.5" r="156.775"></circle>
-                                    <circle style="fill:#99EFF2;" cx="255.53" cy="170.5" r="156.775"></circle>
-                                        <path style="fill:#FFFFFF;" d="M399.023,199.001c0,0-100.395-13.715-143.023,21.116c-42.88-35.039-142.023-21.116-142.023-21.116 s34.389,98.73,86.343,118.271c-8.463,54.14,55.184,124.018,55.681,124.018c0.499,0,64.229-70.123,55.621-124.374 C363.214,297.131,399.023,199.001,399.023,199.001z"></path> 
-                                        <path style="fill:#91DC5A;" d="M256,220.117c14.291,11.678,26.754,26.087,36.53,43.019c9.888,17.128,16.168,35.347,19.092,53.78 c51.591-19.786,90.066-66.045,98.784-122.155C357.575,174.829,298.627,185.286,256,220.117z"></path> 
-                                        <path style="fill:#006DF0;" d="M200.32,317.272c2.9-18.554,9.198-36.898,19.152-54.136c9.774-16.932,22.238-31.339,36.529-43.019 c-42.88-35.039-102.273-45.415-155.344-25.003C109.535,251.405,148.367,297.731,200.32,317.272z"></path> 
-                                        <path d="M256,220.117c-14.291,11.678-26.753,26.087-36.529,43.019c-9.952,17.24-16.251,35.584-19.152,54.136 c17.167,6.458,35.759,9.999,55.182,9.999c19.778,0,38.695-3.671,56.121-10.356c-2.926-18.434-9.204-36.653-19.092-53.78 C282.756,246.204,270.291,231.797,256,220.117z"></path> 
-                                        <path style="fill:#D80027;" d="M311.622,316.916c-17.426,6.683-36.343,10.356-56.121,10.356c-19.423,0-38.015-3.54-55.182-9.999 c-8.463,54.14,12.08,110.071,55.681,145.633C299.699,427.266,320.232,371.167,311.622,316.916z"></path> 
-                                </g>
-                            </svg>
-                        </div>       
-                    </div>
-                </template>
-            </Column>         -->
-            <!-- <Column header="Расходные материалы">
-                <template #body="slotProps">                    
-                    <div v-for="(item, index) in slotProps.data.consumables" :key="index" class="col-12">
-                        <div class="flex flex-column sm:flex-row sm:align-items-center gap-3" :class="{ 'border-top-1 surface-border': index !== 0 }">
-                            <div class="flex mb-2">
-                                <div>
-                                    {{ helper.getTypeConsumableLabel(item.type_consumable) }}
-                                </div>
-                                <div class="ml-2">
-                                    {{ item.name }}
-                                </div>
-                                <div class="ml-2" v-if="item.type_consumable == 'cartridge'">
-                                    <div                                        
-                                        :class="`ml-2 rounded-full h-4 w-4 ${helper.getColor(item.color).color}`"
-                                        v-tooltip="`${helper.getColor(item.color).name}`"
-                                    ></div>
-                                </div>                               
-                            </div>
-                        </div>                                    
-                    </div>
-                </template>
-            </Column>             -->            
+                   
             <template #empty> Нет данных </template>
 
         </DataTable>       

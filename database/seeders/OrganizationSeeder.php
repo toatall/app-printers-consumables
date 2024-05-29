@@ -1,26 +1,33 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\Organization;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class OrganizationSeeder extends Seeder
-{
-    private function dateNow() 
-    {
-        return DB::raw('NOW()');
-    }
+/**
+ * Создание тестовых организаций
+ */
+class OrganizationSeeder extends AbstractSeeder
+{    
     
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $regionCode = $this->getRegionCode();
         Organization::query()->insert([
-            ['code' => '0000', 'name' => 'Org main', 'created_at' => $this->dateNow(), 'updated_at' => $this->dateNow()],
-            ['code' => '0001', 'name' => 'Sub org 1', 'created_at' => $this->dateNow(), 'updated_at' => $this->dateNow()],
+            [
+                'code' => "{$regionCode}00", 
+                'name' => 'Управление', 
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],
+            [
+                'code' => "{$regionCode}01", 
+                'name' => 'Инспекция', 
+                'created_at' => $this->getDbNowDate(), 
+                'updated_at' => $this->getDbNowDate(),
+            ],
         ]);
     }
 }
