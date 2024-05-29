@@ -7,6 +7,7 @@ use App\Http\Requests\Dictionary\PrinterRequest;
 use App\Models\Consumable\CartridgeColors;
 use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableTypesEnum;
+use App\Models\Manufacturer;
 use App\Models\Printer\Printer;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
@@ -25,6 +26,14 @@ class PrintersController extends Controller
         // настройка прав доступа
         $this->middleware('role:admin,editor-dictionary')
             ->only(['create', 'store', 'edit', 'update', 'destroy']);
+    }
+
+    private function manufacturersList()
+    {
+        return Manufacturer::query()->get()->transform(fn(Manufacturer $item) => [
+            'label' => $item->name,
+            'value' => $item->name,
+        ]);
     }
 
     /**
@@ -47,6 +56,7 @@ class PrintersController extends Controller
     {
         return Inertia::render('Dictionary/Printers/Create', [
             'labels' => Printer::labels(),
+            'manufacturers' => $this->manufacturersList(),
         ]); 
     }
 

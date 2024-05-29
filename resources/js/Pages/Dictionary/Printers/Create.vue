@@ -11,6 +11,7 @@ defineOptions({
 
 const props = defineProps({
     labels: Object,
+    manufacturers: Array,
 });
 const labels = reactive(props.labels);
 const title = 'Добавление принтера';
@@ -26,7 +27,7 @@ const urls = inject('urls');
         { label: title },
     ]" />
 
-    <Form :isNew="true" :labels="labels" :printer="{ vendor: null, name: null, is_color_print: false }"></Form>    
+    <Form :isNew="true" :labels="labels" :printer="{ vendor: null, name: null, is_color_print: false }" :manufacturers="manufacturers"></Form>    
 
 </template>
 

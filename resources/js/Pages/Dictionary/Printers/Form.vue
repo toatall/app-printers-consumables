@@ -3,21 +3,24 @@ import InputText from 'primevue/inputtext'
 import InlineMessage from 'primevue/inlinemessage'
 import InputSwitch from 'primevue/inputswitch'
 import Label from '@/Shared/Label'
-import { inject, reactive } from 'vue'
+import { inject, reactive, ref } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
 import LoadingButton from '@/Shared/LoadingButton'
 import Button from 'primevue/button'
 import { Inertia } from '@inertiajs/inertia'
 import { useConfirm } from "primevue/useconfirm";
+import Dropdown from 'primevue/dropdown';
 
 const props = defineProps({
     isNew: Boolean,
     labels: Object,
     printer: Object,
+    manufacturers: Array,
 });
 const printer = reactive(props.printer);
 const urls = inject('urls');
 const confirm = useConfirm();
+const dropdownManufacturers = ref(props.manufacturers);
 
 const form = useForm({    
     vendor: printer.vendor,
@@ -54,10 +57,13 @@ const destroy = () => {
                 <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div class="sm:col-span-4">                                        
                         <Label for="vendor">{{ labels.vendor }}</Label>
-                        <InputText
-                            class="w-full"
+                        <Dropdown 
+                            class="w-full" 
                             v-model="form.vendor" 
-                            :placeholder="labels.vendor" 
+                            :options="dropdownManufacturers" 
+                            optionLabel="label" 
+                            optionValue="value" 
+                            :placeholder="labels.vendor"
                             :invalid="form.errors?.vendor?.length > 0"
                         />
                         <InlineMessage v-if="form.errors?.vendor" class="mt-2" severity="error">{{ form.errors?.vendor }}</InlineMessage>
