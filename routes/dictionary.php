@@ -7,7 +7,7 @@ use App\Http\Controllers\Dictionary\PrintersController;
 use App\Http\Controllers\Dictionary\OrganizationsController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('dictionary')->name('dictionary.')->middleware('role:admin')->group(function() {
+Route::prefix('dictionary')->name('dictionary.')->group(function() {
 
     // принтеры
     Route::resource('printers', PrintersController::class);
