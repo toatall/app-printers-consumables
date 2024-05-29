@@ -12,6 +12,7 @@ defineOptions({
 const props = defineProps({
     printer: Object,
     labels: Object,    
+    manufacturers: Array,
 });
 const labels = ref(props.labels);
 const title = computed({
@@ -31,7 +32,7 @@ const urls = inject('urls');
         { label: 'Редактирование' },
     ]" />
 
-    <Form :isNew="false" :labels="labels" :printer="printer"></Form>        
+    <Form :isNew="false" :labels="labels" :printer="printer" :manufacturers="manufacturers"></Form>        
     
 </template>
 
