@@ -36,9 +36,12 @@ class PrintersWorkplaceController extends Controller
      */
     private function allPrinters()
     {
-        return Printer::all()->transform(fn(Printer $printer) => [
-            'id' => $printer->id,
-            'name' => "$printer->vendor $printer->model",
+        return Printer::orderBy('vendor')
+            ->orderBy('model')
+            ->get()
+            ->transform(fn(Printer $printer) => [
+                'id' => $printer->id,
+                'name' => "$printer->vendor $printer->model",
         ]);
     }
     
