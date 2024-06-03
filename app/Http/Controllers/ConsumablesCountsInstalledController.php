@@ -8,6 +8,7 @@ use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountInstalled;
 use App\Models\Consumable\ConsumableTypesEnum;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 
 class ConsumablesCountsInstalledController extends Controller
@@ -79,9 +80,12 @@ class ConsumablesCountsInstalledController extends Controller
      */
     public function destroy(Consumable $consumable, ConsumableCount $count, ConsumableCountInstalled $installed)
     {
-        $installed->delete();
-        return redirect()->route('counts.show', [$count])
-            ->with('success', 'Запись удалена');
+        if (Auth::user()->hasRole('admin') || $installed->id_author !== Auth::user()->id) {
+            $installed->delete();
+            return redirect()->route('counts.show', [$count])
+                ->with('success', 'Запись удалена');
+        }
+        throw new AuthorizationException();
     }
 
 }

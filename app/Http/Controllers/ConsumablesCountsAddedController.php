@@ -5,18 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Consumable\Consumable;
 use App\Models\Consumable\ConsumableCount;
 use App\Models\Consumable\ConsumableCountAdded;
-
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Auth;
 
 class ConsumablesCountsAddedController extends Controller
-{
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct()
-    {
-        $this->middleware('role:admin')->only(['destroy']);
-    }
+{    
 
     /**
      * Список количества добавленных расходных материалов
@@ -39,8 +32,12 @@ class ConsumablesCountsAddedController extends Controller
      */
     public function destroy(Consumable $consumable, ConsumableCount $count, ConsumableCountAdded $added)
     {
-        $added->delete();
-        return redirect()->route('counts.show', [$count])
-            ->with('success', 'Запись удалена');
+        $this->middleware('role:admins')->only(['destroy']);
+        if (Auth::user()->hasRole('admin') || $added->id_author !== Auth::user()->id) {
+            $added->delete();
+            return redirect()->route('counts.show', [$count])
+                ->with('success', 'Запись удалена');
+        }
+        throw new AuthorizationException();
     }
 }
