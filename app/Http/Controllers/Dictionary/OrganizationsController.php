@@ -13,14 +13,36 @@ use Inertia\Inertia;
  */
 class OrganizationsController extends Controller
 {
+
+    private function getOrganizationsTree($parent = null)
+    {
+        $items = Organization::where('parent', '=',  $parent)->get();
+        $result = [];
+        foreach($items as $item) {
+            $result[] = [
+                'key' => $item->code,
+                'data' => [
+                    'code' => $item->code,
+                    'parent' => $item->parent,
+                    'name' => $item->name,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                ],
+                'children' => $this->getOrganizationsTree($item->code),
+            ];
+        }
+        return $result;
+    }
+
+
     /**
      * Список организаций
      * @return \Inertia\Response
      */
     public function index()
-    {        
+    {             
         return Inertia::render('Dictionary/Organizations/Index', [
-            'organizations' => Organization::all(), 
+            'organizations' => $this->getOrganizationsTree(),
             'labels' => Organization::labels(),
         ]);
     }
@@ -85,7 +107,7 @@ class OrganizationsController extends Controller
      */
     public function update(OrganizationRequest $request, Organization $organization)
     {
-        $organizationUpdate = $organization->update($request->only(['code', 'name']));        
+        $organizationUpdate = $organization->update($request->all());        
         if (!$organizationUpdate) {
             return redirect()->back();
         }        

@@ -15,6 +15,7 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 import CircleIcon from 'vue-material-design-icons/Circle';
 
 import Lara from '@/presets/lara';
+import Wind from '@/presets/wind';
 import PrimeVue from 'primevue/config';
 import DialogService from 'primevue/dialogservice';
 import DynamicDialog from 'primevue/dynamicdialog';

@@ -100,8 +100,19 @@ const title = 'Пользователи'
                 </Column>
                 <Column field="fio" header="ФИО" />
                 <Column field="department" header="Отдел" />
-                <Column field="lotus_mail" header="Почта" />
-                <Column header="Роли">
+                <Column field="lotus_mail" header="Коммуникация" class="w-50">
+                    <template #body="{ data }">
+                        <div v-if="data.telephone">
+                            <span class="pi pi-phone me-1"></span>
+                            {{ data.telephone }}
+                        </div>
+                        <div v-if="data.lotus_mail">
+                            <span class="pi pi-send me-1 mt-2"></span>
+                            {{ data.lotus_mail }}
+                        </div>
+                    </template>
+                </Column>                
+                <Column header="Роли" class="w-64">
                     <template #body="{ data }">
                         <ul v-if="data.roles?.length > 0">
                             <li v-for="role in data.roles"
@@ -109,7 +120,21 @@ const title = 'Пользователи'
                                 {{ role.description }}
                             </li>
                         </ul>
-                        <span v-else>Нет ролей</span>
+                        <span v-else class="bg-yellow-100 text-yellow-800 text-sm font-medium m-2 px-2.5 py-0.5 rounded-lg">
+                            Нет ролей
+                        </span>
+                    </template>
+                </Column>
+                <Column header="Контекст" class="w-52">
+                    <template #body="{ data }">
+                        <ul v-if="data.organizations.length > 0">
+                            <li v-for="organization in data.organizations" class="bg-blue-100 text-blue-800 text-sm font-medium m-2 px-2.5 py-0.5 rounded-lg">
+                                {{ organization.name }}
+                            </li>
+                        </ul>
+                        <span v-else class="bg-yellow-100 text-yellow-800 text-sm font-medium m-2 px-2.5 py-0.5 rounded-lg">
+                            Без контекста
+                        </span>
                     </template>
                 </Column>
                 <Column header="Статус">

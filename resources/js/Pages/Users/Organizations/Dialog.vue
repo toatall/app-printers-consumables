@@ -4,7 +4,7 @@ import axios from 'axios'
 import ProgressSpinner from 'primevue/progressspinner'
 import { Inertia } from '@inertiajs/inertia'
 import Message from 'primevue/message'
-import DataTable from 'primevue/datatable'
+import TreeTable from 'primevue/treetable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 
@@ -30,8 +30,8 @@ const loadData = () => {
     errorMessage.value = null
     axios.get(urls.users.organizations.index())
         .then((response) => {            
-            organizations.value = response.data.organizations
-            organizationLabels = response.data.organizationLabels
+            organizations.value = response.data.organizations;
+            organizationLabels = response.data.organizationLabels;            
         })
         .catch((error) => {
             console.log(error)
@@ -64,17 +64,17 @@ const change = (code, event) => {
         {{ errorMessage }}
     </Message>
     
-    <DataTable v-else 
+    <TreeTable v-else 
         :value="organizations" 
         tableStyle="min-width: 50rem" 
         class="m-4" 
         selectionMode="single"                 
         dataKey="code" 
     >  
-        <Column field="code" :header="organizationLabels.code" sortable />
+        <Column field="code" :header="organizationLabels.code" sortable expander />
         <Column field="name" :header="organizationLabels.name" sortable />
         <Column header="">
-            <template #body="{ data }">
+            <template #body="{ node: { data } }">
                 <div v-if="saving" class="flex justify-center">
                     <ProgressSpinner style="width: 1rem; height: 1rem" />
                 </div>
@@ -83,6 +83,6 @@ const change = (code, event) => {
                 </Button>
             </template>
         </Column>
-    </DataTable> 
+    </TreeTable> 
     
 </template>

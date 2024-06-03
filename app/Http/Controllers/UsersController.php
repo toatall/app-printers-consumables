@@ -41,18 +41,24 @@ class UsersController extends Controller
             'name' => $role->name,
             'description' => $role->description,
         ]);
-    }
+    }    
 
     /**
      * Все организации
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
-    private function organizations()
+    private function getOrganizationsTree($parent = null)
     {
-        return Organization::all()->transform(fn(Organization $organization) => [
-            'code' => $organization->code,
-            'name' => $organization->name,
-        ]);
+        $items = Organization::where('parent', '=',  $parent)->get();
+        $result = [];
+        foreach($items as $item) {
+            $result[] = [
+                'code' => $item->code,
+                'name' => $item->name,
+                'children' => $this->getOrganizationsTree($item->code),
+            ];
+        }
+        return $result;
     }
 
     /**
@@ -69,10 +75,12 @@ class UsersController extends Controller
             'fio' => $user->fio,
             'department' => $user->department,
             'lotus_mail' => $user->lotus_mail,
+            'telephone' => $user->telephone,
             'photo' => $user->photo_path ? URL::route('image', ['path' => $user->photo_path, 'w' => 40, 'h' => 40, 'fit' => 'crop']) : null,
             'roles' => $user->roles,
             'permissions' => $user->permissions,
             'deleted_at' => $user->deleted_at,
+            'organizations' => $user->organizations,
         ];
     }   
 
@@ -144,7 +152,8 @@ class UsersController extends Controller
                 'deleted_at' => $user->deleted_at,
                 'roles' => $user->roles()->get()->transform(fn(Role $role) => [
                     'name' => $role->name,
-                ]),                
+                    'description' => $role->description,
+                ]),
                 'organizations' => $user->organizations,
                 'fio' => $user->fio,
                 'domain' => $user->domain,
@@ -156,8 +165,7 @@ class UsersController extends Controller
                 'lotus_mail' => $user->lotus_mail,
             ],
             'roles' => $this->roles(),             
-            'organizations' => $this->organizations(),
-            //'rolesLabels' => User::rolesLabels(),           
+            'organizations' => $this->getOrganizationsTree(),               
         ]);
     }
 
@@ -166,7 +174,7 @@ class UsersController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(User $user)
-    {
+    {        
         // валидация
         Request::validate([         
             'photo' => ['nullable', 'image'],

@@ -20,7 +20,7 @@ const moment = inject('moment')
                 </template>
                 <template v-else>
                     {{ item.value }}
-                </template>                
+                </template>
             </td>
         </tr>
     </table>

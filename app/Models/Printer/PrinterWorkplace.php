@@ -66,7 +66,7 @@ class PrinterWorkplace extends Model
     {
         return [
             'id_printer' => 'Принтер',
-            'org_code' => 'Код организации',
+            'org_code' => 'Организация',
             'location' => 'Кабинет',
             'serial_number' => 'Серийный номер',
             'inventory_number' => 'Инвентарный номер',

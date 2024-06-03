@@ -165,7 +165,7 @@ const items = ref([
                                 <div v-for="organization in availableOrganizations" :key="organization.code" class="flex items-center mt-2">
                                     <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
                                     <label :for="organization.code" class="ml-2 cursor-pointer">
-                                        {{ `${organization.name} (${organization.code})` }}
+                                        {{ organization.label }}
                                     </label>
                                 </div>
                             </div>

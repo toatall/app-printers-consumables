@@ -29,10 +29,11 @@ const props = defineProps({
     organizations: Array,
     organizationLabels: Object,
     allOrganizations: Array,
+    auth: Object,
 });
 
 const urls = inject('urls');
-const auth = inject('auth');
+const authenticate = inject('auth');
 const title = props.consumableTitle;
 const consumableCountLabels = props.consumableCountLabels;
 const dialog = useDialog();
@@ -124,14 +125,14 @@ const saveOrganizations = () => {
                     доступное количество
                 </span>
                 <Button 
-                    v-if="auth.can('admin', 'add-consumables')" 
+                    v-if="authenticate.can('admin', 'add-consumables')" 
                     text rounded icon="pi pi-plus" 
                     class="font-bold" 
                     @click="actions.add" 
                     v-tooltip="`Добавить`" 
                 />
                 <Button 
-                    v-if="auth.can('admin', 'subtract-consumable') && consumableCount.count > 0" 
+                    v-if="authenticate.can('admin', 'subtract-consumable') && consumableCount.count > 0" 
                     text rounded icon="pi pi-minus"                    
                     class="font-bold" 
                     @click="actions.subtract" 
@@ -160,7 +161,7 @@ const saveOrganizations = () => {
             <template #header>
                 <i class="pi pi-replay me-2"></i> Журнал
             </template>
-            <ShowJournal :consumable="consumable" :consumableCount="consumableCount" />
+            <ShowJournal :consumable="consumable" :consumableCount="consumableCount" :auth="auth" />
         </TabPanel>
 
         <TabPanel>
@@ -198,7 +199,7 @@ const saveOrganizations = () => {
                 selectionMode="single"
                 v-else
             >          
-                <template #header v-if="auth.can('admin', 'add-consumables')">
+                <template #header v-if="authenticate.can('admin', 'add-consumables')">
                     <Button severity="success" @click="visibleOrganizationsEdit = true" size="small" label="Редактировать" />                        
                 </template>      
 

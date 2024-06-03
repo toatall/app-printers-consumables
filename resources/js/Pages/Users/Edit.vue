@@ -7,10 +7,11 @@ import Panel from 'primevue/panel'
 import FileUpload from 'primevue/fileupload'
 import { Inertia } from '@inertiajs/inertia'
 import Checkbox from 'primevue/checkbox'
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onMounted } from 'vue'
 import Menu from 'primevue/menu'
 import ProgressSpinner from 'primevue/progressspinner'
 import Button from 'primevue/button'
+import TreeSelect from 'primevue/treeselect'
 
 const props = defineProps({
     user: Object,
@@ -77,9 +78,12 @@ const uploadFile = async(event) => {
     update()    
 }
 
-const isAdmin = computed(() => {    
+const isSelectedAdmin = computed(() => {    
     return form.selectedRoles.indexOf('admin') >= 0
 })
+
+const classLabelWeight = 'w-1/6';
+
 </script>
 <template>    
 
@@ -105,10 +109,10 @@ const isAdmin = computed(() => {
                 <Menu ref="menu" :model="menuItems" popup />
             </template>
             
-            <div class="max-w-2xl">
+            <div class="w-full">
                 
                 <div class="mb-5 flex">                   
-                    <div class="w-1/3">
+                    <div :class="classLabelWeight">
                         <img v-if="user.photo" class="block rounded-full" :src="user.photo" />
                     </div>
                     <div class="w-1/3">
@@ -128,68 +132,72 @@ const isAdmin = computed(() => {
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Имя</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Имя</div>
                     <div>{{ user.name }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">ФИО</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">ФИО</div>
                     <div>{{ user.fio }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Учетная запись</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Учетная запись</div>
                     <div>{{ user.email }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Домен</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Домен</div>
                     <div>{{ user.domain }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Организация</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Организация</div>
                     <div>{{ user.org_code }} {{ user.company }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Отдел</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Отдел</div>
                     <div>{{ user.department }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Должность</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Должность</div>
                     <div>{{ user.post }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Телефон</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Телефон</div>
                     <div>{{ user.telephone }}</div>
                 </div>
 
                 <div class="flex mb-6">
-                    <div class="w-1/3 text-gray-500 font-semibold">Email</div>
+                    <div class="text-gray-500 font-semibold" :class="classLabelWeight">Email</div>
                     <div>{{ user.lotus_mail }}</div>
                 </div>
 
                 <ProgressSpinner v-if="form.processing"></ProgressSpinner>
                 <template v-else>
                     <div class="flex mb-6">
-                        <div class="w-1/3 text-gray-500 font-semibold">Роли</div>
+                        <div class="text-gray-500 font-semibold" :class="classLabelWeight">Роли</div>
                         <div>
-                            <div v-if="auth.can('admin')">                                                       
+                            <div v-if="auth.can('admin')">
                                 <div v-for="role in roles" :key="role.name" class="flex items-center mt-2">
-                                    <template v-if="!(isAdmin && role.name != 'admin')">
+                                    <template v-if="!(isSelectedAdmin && role.name != 'admin')">
                                         <Checkbox v-model="form.selectedRoles" :inputId="role.name" name="roles" :value="role.name" />
                                         <label :for="role.name" class="ml-2 cursor-pointer">
                                             {{ role.description }}
                                         </label>
-                                </template>
+                                    </template>
                                 </div>                            
                             </div>
                             <div v-else>
-                                <ul>
+                                <div v-if="user.roles.length == 0" class="text-orange-600">
+                                    Роли не назначены
+                                </div>
+                                <ul v-else>
                                     <li v-for="role in user.roles" class="mt-2">
+                                        <span class="pi pi-users me-1"></span>
                                         {{ role.description }}
                                     </li>
                                 </ul>
@@ -197,25 +205,42 @@ const isAdmin = computed(() => {
                         </div>
                     </div>
 
-                    <div class="flex mb-6" v-if="!isAdmin">
-                        <div class="w-1/3 text-gray-500 font-semibold">Контекст</div>
-                        <div>
-                            <div v-if="auth.can('admin')">                            
-                                <div v-for="organization in organizations" :key="organization.code" class="flex items-center mt-2">
-                                    <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
-                                    <label :for="organization.code" class="ml-2 cursor-pointer">
-                                        {{ `${organization.name} (${organization.code})` }}
-                                    </label>
+                    <div class="flex mb-6" v-if="!isSelectedAdmin">
+                        <div class="w-1/6 text-gray-500 font-semibold">Контекст</div>
+
+                        <div v-if="auth.can('admin')">                            
+                            <div v-for="organization in organizations" :key="organization.code" class="mb-2">
+                                <Checkbox v-model="form.selectedOrganizations" :inputId="organization.code" name="organizations" :value="organization.code" />
+                                <label :for="organization.code" class="ml-2 cursor-pointer">
+                                    {{ `${organization.name} (${organization.code})` }}
+                                </label>
+                                <div class="my-2" v-if="organization.children.length > 0">                                    
+                                    <div v-for="subOrganization in organization.children" :key="subOrganization.code" class="ms-5 mb-2">                                       
+                                        <Checkbox v-model="form.selectedOrganizations" :inputId="subOrganization.code" name="organizations" :value="subOrganization.code" />
+                                        <label :for="subOrganization.code" class="ml-2 cursor-pointer">                                            
+                                            {{ `${subOrganization.name} (${subOrganization.code})` }}
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                            <div v-else>
-                                <ul>
-                                    <li v-for="organization in organizations" class="mt-2">
-                                        {{ organization.name }}
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
+                        <div v-else>
+                            <ul>
+                                <li v-for="organization in organizations" class="mt-2">
+                                    <span class="pi pi-building me-1"></span>
+                                    {{ organization.name }}
+                                    <template v-if="organization.children.length > 0">
+                                        <ul class="ms-5">
+                                            <li v-for="subOrganization in organization.children" class="mt-2">
+                                                <span class="pi pi-building me-1"></span>
+                                                {{ subOrganization.name }}
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
                 </template>
 

@@ -41,6 +41,7 @@ class PrinterWorkplaceRequest extends FormRequest
                             ->where('id', '<>', $id);
                     }),                  
             ],
+            'org_code' => 'required',
         ];
     }
 

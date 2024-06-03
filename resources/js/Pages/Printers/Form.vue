@@ -2,15 +2,18 @@
 import InputText from 'primevue/inputtext'
 import InlineMessage from 'primevue/inlinemessage'
 import Label from '@/Shared/Label'
-import { inject, reactive } from 'vue'
+import { inject, onMounted, reactive, ref } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
+import TreeSelect from 'primevue/treeselect'
 
 const props = defineProps({    
     labels: Object,
     printers: Object,
     printerWorkplace: Object,
+    organizations: Array,
+    isNew: Boolean,
 });
 const urls = inject('urls');
 const printerWorkplace = reactive(props.printerWorkplace);
@@ -20,7 +23,8 @@ const form = useForm({
     id_printer: printerWorkplace.id_printer,        
     location: printerWorkplace.location,
     serial_number: printerWorkplace.serial_number,
-    inventory_number: printerWorkplace.inventory_number,    
+    inventory_number: printerWorkplace.inventory_number,
+    org_code: printerWorkplace.org_code,
 });
 const isNew = printerWorkplace.id === null;
 const save = () => {    
@@ -31,6 +35,14 @@ const save = () => {
         form.put(urls.printers.update(printerWorkplace.id))
     }
 };
+
+const organizationSelected = ref()
+const organizationChange = (value) => {
+    form.org_code = Object.keys(value).shift();
+}
+onMounted(() => {
+    organizationSelected.value = { [printerWorkplace.org_code]: true };
+})
 
 </script>
 <template>
@@ -44,6 +56,22 @@ const save = () => {
                         <Label for="id_printer">{{ labels.id_printer }}</Label>                 
                         <Dropdown v-model="form.id_printer" filter :options="printers" optionLabel="name" optionValue="id" placeholder="Выберите принтер" class="w-full" />
                         <InlineMessage v-if="form.errors?.id_printer" class="mt-2" severity="error">{{ form.errors?.id_printer }}</InlineMessage>
+                    </div>
+                </div>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <Label for="org_code">{{ labels.org_code }}</Label>                 
+                        <TreeSelect 
+                            v-model="organizationSelected" 
+                            :options="organizations" 
+                            placeholder="Выберите организацию" 
+                            class="w-full" 
+                            selectionMode="single"                            
+                            :metaKeysSelection="false"
+                            @update:model-value="organizationChange"            
+                        />
+                        <InlineMessage v-if="form.errors?.org_code" class="mt-2" severity="error">{{ form.errors?.org_code }}</InlineMessage>
                     </div>
                 </div>
                 

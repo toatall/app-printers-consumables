@@ -7,6 +7,7 @@ import Card from 'primevue/card';
 import { Inertia } from '@inertiajs/inertia';
 import { useConfirm } from "primevue/useconfirm";
 import Button from 'primevue/button';
+import Detail from '@/Shared/Detail.vue';
 
 defineOptions({
     layout: Layout,
@@ -18,7 +19,6 @@ const props = defineProps({
 });
 
 const urls = inject('urls');
-const moment = inject('moment');
 const organization = props.organization;
 const labels = props.labels;
 const confirm = useConfirm();
@@ -49,46 +49,15 @@ const deleteOrganization = () => {
     <Card>
         <template #title> {{ title }} </template>
         <template #content>
-            <table class="w-1/2 text-left text-gray-700">
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <th class="px-6 py-4">{{ labels.code }}</th>
-                    <td class="px-6 py-4">
-                        {{ organization.code }}
-                    </td>
-                </tr>
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <th class="px-6 py-4">{{ labels.name }}</th>
-                    <td class="px-6 py-4">
-                        <div class="flex">
-                            {{ organization.name }}
-                        </div>
-                    </td>
-                </tr>                
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <th class="px-6 py-4">
-                        {{ labels.created_at }}
-                    </th>
-                    <td class="px-6 py-4">
-                        <div>
-                            <i class="far fa-calendar"></i>
-                            {{ moment(organization.created_at).fromNow() }}
-                            ({{ moment(organization.created_at).format('LLLL') }})
-                        </div> 
-                    </td>
-                </tr>
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <th class="px-6 py-4">
-                        {{ labels.updated_at }}
-                    </th>
-                    <td class="px-6 py-4">
-                        <div>
-                            <i class="far fa-calendar-alt"></i>      
-                            {{ moment(organization.updated_at).fromNow() }}
-                            ({{ moment(organization.updated_at).format('LLLL') }})
-                        </div>
-                    </td>
-                </tr>
-            </table>
+
+            <Detail :items="[
+                { label: labels.code, value: organization.code }, 
+                { label: labels.parent, value: organization.parent },
+                { label: labels.name, value: organization.name },
+                { label: labels.created_at, value: organization.created_at, format: 'date' },
+                { label: labels.updated_at, value: organization.updated_at, format: 'date' },
+            ]">        
+            </Detail>            
 
             <div class="flex justify-between mt-10">
                 <Button class="font-bold" @click="goToEdit">Редактировать</Button>

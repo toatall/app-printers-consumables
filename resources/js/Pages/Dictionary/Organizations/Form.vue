@@ -20,6 +20,7 @@ const confirm = useConfirm();
 const form = useForm({    
     code: organization.code,
     name: organization.name,
+    parent: organization.parent,
 });
 
 const save = () => {    
@@ -57,6 +58,19 @@ const destroy = () => {
                             :invalid="form.errors?.code?.length > 0"
                         />
                         <InlineMessage v-if="form.errors?.code" class="mt-2" severity="error">{{ form.errors?.code }}</InlineMessage>
+                    </div>
+                </div>
+
+                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-4">                                        
+                        <Label for="parent">{{ labels.parent }}</Label>
+                        <InputText
+                            class="w-full"
+                            v-model="form.parent" 
+                            :placeholder="labels.parent" 
+                            :invalid="form.errors?.parent?.length > 0"
+                        />
+                        <InlineMessage v-if="form.errors?.parent" class="mt-2" severity="error">{{ form.errors?.parent }}</InlineMessage>
                     </div>
                 </div>
 

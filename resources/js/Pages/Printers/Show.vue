@@ -19,6 +19,7 @@ const props = defineProps({
     printerWorkplace: Object,
     printerLabels: Object,
     printerWorkplaceLabels: Object,    
+    organization: Object,
 });
 
 const printer = props.printerWorkplace.printer;
@@ -59,6 +60,10 @@ const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})
                     { 
                         label: printerLabels.is_color_print, 
                         value: printer.is_color_print ? 'Да': 'Нет',
+                    },
+                    {
+                        label: printerWorkplaceLabels.org_code, 
+                        value: `${organization.name} (${organization.code})`,
                     },
                     { 
                         label: printerWorkplaceLabels.location, 

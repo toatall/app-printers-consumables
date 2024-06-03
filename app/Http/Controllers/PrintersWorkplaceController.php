@@ -89,6 +89,7 @@ class PrintersWorkplaceController extends Controller
         return Inertia::render('Printers/Create', [
             'labels' => PrinterWorkplace::labels(),      
             'printers' => $this->allPrinters(),
+            'organizations' => Auth::user()->availableOrganizations(),
         ]); 
     }
 
@@ -99,12 +100,7 @@ class PrintersWorkplaceController extends Controller
      */
     public function store(PrinterWorkplaceRequest $request)
     {
-        $printerWorkplace = PrinterWorkplace::create(
-            array_merge(
-                ['org_code' => Auth::user()->org_code], 
-                $request->only(['id_printer', 'location', 'serial_number', 'inventory_number']),
-            )
-        );
+        $printerWorkplace = PrinterWorkplace::create($request->only(['id_printer', 'location', 'serial_number', 'inventory_number', 'org_code']));
         if (!$printerWorkplace) {
             return redirect()->back();
         }
@@ -123,7 +119,8 @@ class PrintersWorkplaceController extends Controller
             'printerWorkplace.printer' => $workplace->printer,
             'printerWorkplace.author' => $workplace->author,
             'printerLabels' => Printer::labels(),
-            'printerWorkplaceLabels' => PrinterWorkplace::labels(),            
+            'printerWorkplaceLabels' => PrinterWorkplace::labels(),        
+            'organization' => $workplace->organization,    
         ]);
     }
 
@@ -138,6 +135,7 @@ class PrintersWorkplaceController extends Controller
             'printerWorkplace.printer' => $workplace->printer,
             'printers' => $this->allPrinters(),
             'labels' => PrinterWorkplace::labels(),
+            'organizations' => Auth::user()->availableOrganizations(),
         ]);
     }
 
@@ -148,7 +146,7 @@ class PrintersWorkplaceController extends Controller
      */
     public function update(PrinterWorkplaceRequest $request, PrinterWorkplace $workplace)
     {
-        $workplaceUpdate = $workplace->update($request->only(['id_printer', 'location', 'serial_number', 'inventory_number']));        
+        $workplaceUpdate = $workplace->update($request->only(['id_printer', 'location', 'serial_number', 'inventory_number', 'org_code']));        
         if (!$workplaceUpdate) {
             return redirect()->back();
         }

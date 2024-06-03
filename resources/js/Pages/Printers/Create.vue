@@ -12,6 +12,8 @@ const urls = inject('urls');
 const props = defineProps({
     labels: Object,
     printers: Object,
+    auth: Object,
+    organizations: Array,
 });
 const title = 'Добавление принтера';
 </script>
@@ -28,7 +30,8 @@ const title = 'Добавление принтера';
         :isNew="true" 
         :labels="labels" 
         :printers="printers" 
-        :printerWorkplace="{ id: null, id_printer: null, location: null, serial_number: null, inventory_number: null }"
+        :printerWorkplace="{ id: null, id_printer: null, location: null, serial_number: null, inventory_number: null, org_code: props.auth?.user?.org_code }"
+        :organizations="organizations"
     ></Form>
 
 </template>

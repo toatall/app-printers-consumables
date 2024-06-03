@@ -45,9 +45,10 @@ Route::middleware('auth')->group(function() {
         ->name('dashboard');
 
     // Users
-    Route::resource('users', UsersController::class)->except(['show']);
+    Route::resource('users', UsersController::class)->except(['show'])->withTrashed(['edit']);
     Route::put('users/{user}/restore', [UsersController::class, 'restore'])
         ->name('users.restore')
+        ->withTrashed()
         ->middleware('role:admin');
 
     Route::get('users/organizations', [UsersOrganizationsController::class, 'index'])

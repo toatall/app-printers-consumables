@@ -13,6 +13,7 @@ const props = defineProps({
     labels: Object,
     printers: Object,
     printerWorkplace: Object,
+    organizations: Array,
 });
 const title = 'Редактирование';
 
@@ -32,6 +33,7 @@ const title = 'Редактирование';
         :labels="labels" 
         :printers="printers" 
         :printerWorkplace="printerWorkplace"
+        :organizations="organizations"
     ></Form>        
     
 </template>

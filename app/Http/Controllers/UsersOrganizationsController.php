@@ -16,7 +16,7 @@ class UsersOrganizationsController extends Controller
      * @return array
      */
     public function index()
-    {       
+    {
         return [
             'organizations' => Auth::user()->availableOrganizations(),
             'organizationLabels' => Organization::labels(),
@@ -30,7 +30,7 @@ class UsersOrganizationsController extends Controller
      */
     public function change(Organization $organization)
     {                
-        if (Auth::user()->availableOrganizations()->where('code', $organization->code)->count() > 0) {           
+        if (Auth::user()->isAvailableByOrgCode($organization->code)) {
             Auth::user()->changeSelectedOrganization($organization->code);
             return redirect()->back()
                 ->with('success', "Выбрана организация с кодом {$organization->code}!");       

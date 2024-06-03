@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 
@@ -91,8 +91,9 @@ class User extends Authenticatable
     /**
      * @param Builder $query
      * @param array $filter
+     * @return void
      */
-    public function scopeFilter(Builder $query, array $filters)
+    public function scopeFilter(Builder $query, array $filters): void
     {        
         $query->whereNotNull('users.id')
             ->withTrashed()
@@ -112,18 +113,73 @@ class User extends Authenticatable
         });
     }   
 
-    public function availableOrganizations()
-    {
-        if (Auth::user()->hasRole('admin')) {
-            return Organization::all();
-        }
-        return $this->organizations;
+    /**
+     * Изменение организации у пользователя
+     * @param string $code код организации
+     * @return void
+     */
+    public function changeSelectedOrganization(string $code)
+    {        
+        $this->org_code = $code;
+        $this->save();
     }
 
-    public function changeSelectedOrganization($code)
+    /**
+     * Проверка доступа к организации $orgCode у текущего пользователя
+     * @param string $orgCode
+     * @return bool
+     */
+    public function isAvailableByOrgCode(string $orgCode): bool
+    {
+        if ($this->hasRole('admin')) {
+            return true;
+        }
+        return Organization::query()
+            ->join('users_organizations', 'users_organizations.org_code', '=', 'organizations.code')
+            ->where('users_organizations.id_user', '=', $this->id)
+            ->where('organizations.code', '=', $orgCode)
+            ->exists();
+    }
+
+    /**
+     * Вложенный список доступных организаций
+     * @param string $parent код родительской организации
+     * @return array
+     */
+    public function availableOrganizations(string $parent = null): array
     {        
-        $this->org_code = $code;        
-        $this->save();
+        $isAdmin = $this->hasRole('admin');
+        $result = [];
+        $items = Organization::query()
+            ->select(['organizations.code', 'organizations.name', 'users_organizations.id AS available'])
+            ->leftJoin('users_organizations', function($join) {
+                $join->on('users_organizations.org_code', '=', 'organizations.code');
+                $join->on('users_organizations.id_user', '=', DB::raw($this->id));                
+            })
+            ->where('organizations.parent', '=', $parent)
+            ->get();
+        
+        if ($items !== null) {
+            foreach($items as $item) {
+                $children = $this->availableOrganizations($item->code);
+                if ($isAdmin || !empty($item->available)) {
+                    $result[] = [
+                        'key' => $item->code,
+                        'label' => "{$item->name} ({$item->code})",
+                        'code' => $item->code, 
+                        'data' => [
+                            'code' => $item->code,
+                            'name' => $item->name,
+                        ],
+                        'children' => $children,
+                    ];
+                }
+                elseif ($children != null) {
+                    $result = $children;
+                }
+            }
+        }
+        return $result;
     }
 
     

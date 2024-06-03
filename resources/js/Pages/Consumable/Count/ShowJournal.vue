@@ -14,9 +14,10 @@ const props = defineProps({
     consumable: Object,
     consumableCount: Object,    
     isOpen: Boolean,
+    auth: Object,
 });
 const urls = inject('urls');
-const auth = inject('auth');
+const authenticate = inject('auth');
 const moment = inject('moment');
 const toast = reactive(useToast());
 const confirm = useConfirm();
@@ -157,9 +158,10 @@ onMounted(() => {
                         </div>
                     </template>
                 </Column>
-                <Column header="" v-if="auth.can('admin')">
+                <Column header="">
                     <template #body="{ data }">
                         <Button 
+                            v-if="authenticate.can('admin') || data.id_author == auth?.user?.id" 
                             v-tooltip="`Отменить`" 
                             icon="fas fa-redo-alt fa-flip-horizontal" 
                             @click="redoJournalAdded(data.id)" 
@@ -215,9 +217,10 @@ onMounted(() => {
                         </div>
                     </template>
                 </Column>
-                <Column header="" v-if="auth.can('admin')">
+                <Column header="">
                     <template #body="{ data }">
                         <Button 
+                            v-if="authenticate.can('admin') || data.id_author == auth?.user?.id" 
                             v-tooltip="`Отменить`" 
                             icon="fas fa-redo-alt fa-flip-horizontal" 
                             @click="redoJournalInstalled(data.id)" 
