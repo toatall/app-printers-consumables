@@ -81,6 +81,7 @@ class ConsumablesCountsController extends Controller
                     ->join('printers', 'printers.id', '=', 'printers_consumables.id_printer')
                     ->join('printers_workplace', 'printers_workplace.id_printer', '=', 'printers.id')
                 ->where('printers_workplace.org_code', '=', Auth::user()->org_code)
+                ->where('consumables_counts_organizations.org_code', '=', Auth::user()->org_code)
                 ->where('printers.id', '=', $printer->id)
                 ->get(),
             'consumableTypes' => ConsumableTypesEnum::array(),
