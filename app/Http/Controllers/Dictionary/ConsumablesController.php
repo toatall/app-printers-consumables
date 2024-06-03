@@ -71,6 +71,7 @@ class ConsumablesController extends Controller
                 'id' => $consumable->id,
                 'type' => $consumable->type,
                 'name' => $consumable->name,
+                'description' => $consumable->description,
                 'color' => $consumable->color,
                 'author' => $consumable->author,
                 'created_at' => $consumable->created_at,
