@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
  * 
  * @property User $author
  * @property Consumable[] $consumables
+ * @property Consumable[] $consumablesDeep
  */
 class Printer extends Model
 {
@@ -75,7 +76,18 @@ class Printer extends Model
             'updated_at' => 'Дата изменения',
             'author' => 'Автор',
         ];
-    }    
+    }
+    
+    public function consumablesDeep()
+    {
+        return $this->belongsToMany(Consumable::class, 'printers_consumables', 'id_printer', 'id_consumable')
+            ->with(['consumableCount' => function($relation) {
+                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
+                $relation->leftJoin('consumables_counts_organizations', 'consumables_counts_organizations.id_consumable_count', '=', 'consumables_counts.id')
+                    ->where('consumables_counts_organizations.org_code', '=', Auth::user()->org_code);                    
+            }]);
+    }
+
 
     /**
      * Расходные материалы привязанные к текущему принтеру

@@ -102,7 +102,7 @@ class PrinterWorkplace extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_author');
-    }
+    }    
 
     /**
      * Фильтр
@@ -111,14 +111,19 @@ class PrinterWorkplace extends Model
      */
     public function scopeFilter(Builder $query, array $filters)
     {   
-        $query
-            ->with(['printer'])     
-            ->where('org_code', Auth::user()->org_code)      
+        $query           
+            ->with(['printer' => function($relation) {
+                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
+                $relation->with(['consumablesDeep']);
+            }])
+            ->where('org_code', Auth::user()->org_code)
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
                 $query
-                    ->whereAny(['location', 'serial_number', 'inventory_number'], 'ILIKE', "%$search%")
-                    ->orWhereHas('printer', fn($query) => 
-                        $query->whereAny(['vendor', 'model'], 'ILIKE', "%$search%")
+                    ->where(fn($query) =>
+                        $query->whereAny(['location', 'serial_number', 'inventory_number'], 'ILIKE', "%$search%")
+                        ->orWhereHas('printer', fn($query) => 
+                            $query->whereAny(['vendor', 'model'], 'ILIKE', "%$search%")
+                        )
                     );
             })
             ->orderByDesc('created_at')

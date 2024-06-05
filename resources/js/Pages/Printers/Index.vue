@@ -12,12 +12,15 @@ import TableTitle from '@/Shared/TableTitle'
 import InputText from 'primevue/inputtext'
 import pickBy from 'lodash/pickBy'
 import throttle from 'lodash/throttle'
+import Badge from 'primevue/badge'
 
 const props = defineProps({
     printersWorkplace: Array,
     printerLabels: Object,
     printerWorkplaceLabels: Object,
-    filters: Object,    
+    filters: Object, 
+    cartridgeColors: Object,
+    consumableTypes: Object,   
 });
 
 defineOptions({
@@ -44,7 +47,6 @@ watch(
     }, 150),
     { deep: true }
 )
-
 
 const title = 'Принтеры';
 
@@ -111,7 +113,46 @@ const actions = {
                         </div>       
                     </div>
                 </template>
-            </Column>        
+            </Column>      
+            <Column header="Расходные материалы">
+                <template #body="{ data }">
+                    <div class="grid gap-y-2 divide-y divide-slate-300 divide-dashed text-sm">
+                        <div class="flex flex-row gap-2 pt-2" v-for="consumable in data?.printer?.consumables_deep">
+                            <div class="grid content-center">
+                                <div v-if="consumable.consumable_count != undefined">
+                                    <Badge 
+                                        :value="consumable.consumable_count.count"  
+                                        :severity="consumable.consumable_count.count <= 1 ? 'danger' 
+                                            : (consumable.consumable_count.count < 10 ? 'warning' : 'success')"
+                                    ></Badge>
+                                </div>
+                                <div v-else>
+                                    <Badge 
+                                        :value="0"                                    
+                                        severity="danger"
+                                    />
+                                </div>
+                            </div>
+                            <div class="grid"> 
+                                <div>
+                                    {{ consumableTypes[consumable.type] ?? consumable.type }}
+                                </div>
+                                <div>
+                                    {{ consumable.name }}
+                                </div>
+                                <div v-if="consumable.type === 'cartridge'">
+                                    <div class="flex">
+                                        <div :class="['rounded-full', 'size-4', 'mr-2', cartridgeColors[consumable.color]['bg']]"></div>
+                                        <div>
+                                            {{ cartridgeColors[consumable.color]['name'] }}
+                                        </div>
+                                    </div>               
+                                </div>
+                            </div>                        
+                        </div> 
+                    </div>
+                </template>
+            </Column>  
             <Column field="location" :header="printerWorkplaceLabels.location" sortable />
             <Column field="serial_number" :header="printerWorkplaceLabels.serial_number" sortable />
             <Column field="inventory_number" :header="printerWorkplaceLabels.inventory_number" sortable />

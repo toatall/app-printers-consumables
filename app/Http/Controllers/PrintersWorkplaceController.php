@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PrinterWorkplaceRequest;
+use App\Models\Consumable\CartridgeColors;
 use App\Models\Consumable\Consumable;
+use App\Models\Consumable\ConsumableCount;
+use App\Models\Consumable\ConsumableTypesEnum;
 use App\Models\Printer\Printer;
 use App\Models\Printer\PrinterWorkplace;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +59,8 @@ class PrintersWorkplaceController extends Controller
             'filters' => Request::all(['search']),
             'printersWorkplace' => PrinterWorkplace::filter(Request::only(['search']))->get(), 
             'printerWorkplaceLabels' => PrinterWorkplace::labels(),
+            'cartridgeColors' => CartridgeColors::get(),
+            'consumableTypes' => ConsumableTypesEnum::array(),
         ]);
     }
 
@@ -116,11 +121,17 @@ class PrintersWorkplaceController extends Controller
     {                
         return Inertia::render('Printers/Show', [
             'printerWorkplace' => $workplace,
-            'printerWorkplace.printer' => $workplace->printer,
+            'printerWorkplace.printer' => $workplace->printer,            
             'printerWorkplace.author' => $workplace->author,
             'printerLabels' => Printer::labels(),
             'printerWorkplaceLabels' => PrinterWorkplace::labels(),        
-            'organization' => $workplace->organization,    
+            'organization' => $workplace->organization,
+
+            'consumables' => $workplace->printer->consumablesDeep,
+            'consumableTypes' => ConsumableTypesEnum::array(),
+            'cartridgeColors' => CartridgeColors::get(),
+            'consumableLabels' => Consumable::labels(),
+            'consumableCountLabels' => ConsumableCount::labels(),
         ]);
     }
 

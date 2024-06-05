@@ -118,6 +118,15 @@ class Consumable extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function consumableCount()
+    {
+        return $this->hasOne(ConsumableCount::class, 'id_consumable', 'id');           
+    }
+    
+
+    /**
      * Фильтр
      * @param Builder $query
      * @param array $filter
