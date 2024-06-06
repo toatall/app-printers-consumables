@@ -111,7 +111,7 @@ const classLabelWeight = 'w-1/6';
             
             <div class="w-full">
                 
-                <div class="mb-5 flex">                   
+                <!-- <div class="mb-5 flex">                   
                     <div :class="classLabelWeight">
                         <img v-if="user.photo" class="block rounded-full" :src="user.photo" />
                     </div>
@@ -129,7 +129,7 @@ const classLabelWeight = 'w-1/6';
                         >
                         </FileUpload>
                     </div>                        
-                </div>
+                </div> -->
 
                 <div class="flex mb-6">
                     <div class="text-gray-500 font-semibold" :class="classLabelWeight">Имя</div>
