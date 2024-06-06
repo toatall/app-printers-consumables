@@ -19,8 +19,17 @@ const form = useForm({
     name: null,   
 })
 
+const LogActions = inject('LogActions');
+
 const save = () => {
-    form.post(urls.users.store())
+    const url = urls.users.store();
+    form.post(url, {
+        onSuccess: () => {
+            LogActions.save(url, 'POST', 'Добавление пользователя', {
+                name: form.name,
+            });
+        },
+    })
 }
 
 </script>

@@ -25,12 +25,20 @@ const confirm = useConfirm();
 
 const title = `${organization.name} (${organization.code})`;
 const goToEdit = () => Inertia.get(urls.dictionary.organizations.edit(organization.code));
+
+const LogActions = inject('LogActions');
+
 const deleteOrganization = () => {
     confirm.require({
         message: 'Вы уверены, что хотите удалить запись?',
         header: 'Удаление записи',
         accept: () => {
-            Inertia.delete(urls.dictionary.organizations.delete(organization.code));
+            const url = urls.dictionary.organizations.delete(organization.code);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление организации', organization);
+                },
+            });
         },
     });    
 };

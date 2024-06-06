@@ -63,7 +63,7 @@ const InstalledDialog = defineAsyncComponent(() => import('@/Pages/Consumable/In
 const btnInstalledDialog = () => {    
     dialog.open(InstalledDialog, {
         props: {
-            header: 'Взять расходный материал',
+            header: 'Вычесть расходный материал',
             style: {
                 width: '50vw',
             },

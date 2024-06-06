@@ -73,19 +73,23 @@ const updateJournalInstalled = () => {
     )
 };
 
+const LogActions = inject('LogActions');
+
 const baseRedo = (url, id, refLoadingObj, fnUpdate) => {
     confirm.require({
         message: 'Вы уверены, что хотите отменить операцию?',
         header: 'Отмена операции',
         accept: () => {            
-            refLoadingObj.idDelete.value = id
-            refLoadingObj.loadingDelete.value = true
+            refLoadingObj.idDelete.value = id;
+            refLoadingObj.loadingDelete.value = true;
 
             Inertia.delete(url, {
                 onSuccess: () => {
-                    fnUpdate()                    
-                    refLoadingObj.idDelete.value = 0
-                    refLoadingObj.loadingDelete.value = false
+                    LogActions.save(url, 'DELETE', 'Отмена операции');
+
+                    fnUpdate();
+                    refLoadingObj.idDelete.value = 0;
+                    refLoadingObj.loadingDelete.value = false;
                 },
             })
         },

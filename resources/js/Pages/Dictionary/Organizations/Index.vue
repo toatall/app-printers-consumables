@@ -1,14 +1,13 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3'
-import Layout from '@/Shared/Layout'
-import { ref, inject } from 'vue'
-import Breadcrumbs from '@/Shared/Breadcrumbs'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Button from 'primevue/button'
-import { Inertia } from '@inertiajs/inertia'
-import TableTitle from '@/Shared/TableTitle'
-import TreeTable from 'primevue/treetable'
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import Layout from '@/Shared/Layout';
+import { ref, inject } from 'vue';
+import Breadcrumbs from '@/Shared/Breadcrumbs';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import { Inertia } from '@inertiajs/inertia';
+import TableTitle from '@/Shared/TableTitle';
+import TreeTable from 'primevue/treetable';
 
 const props = defineProps({
     organizations: Object,

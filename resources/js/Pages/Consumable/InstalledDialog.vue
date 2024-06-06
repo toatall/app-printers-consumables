@@ -12,23 +12,23 @@ import InputNumber from 'primevue/inputnumber';
 import Message from 'primevue/message';
 import { Inertia } from '@inertiajs/inertia';
 
-const urls = inject('urls')
-const config = inject('config')
-const dialogRef = inject('dialogRef')
-const step = ref(0)
+const urls = inject('urls');
+const config = inject('config');
+const dialogRef = inject('dialogRef');
+const step = ref(0);
 
-const loadingPrinters = ref(false)
-const loadingConsumables = ref(false)
+const loadingPrinters = ref(false);
+const loadingConsumables = ref(false);
 
-const printersWorkplacesData = ref()
-const printersWorkplacesIsEmpty = ref(false)
-const printersWorkplacesSelected = ref()
+const printersWorkplacesData = ref();
+const printersWorkplacesIsEmpty = ref(false);
+const printersWorkplacesSelected = ref();
 
-const consumableData = ref()
-const consumableIsEmpty = ref(false)
-const consumableSelected = ref()
-let consumableTypes = null
-let cartridgeColors = null
+const consumableData = ref();
+const consumableIsEmpty = ref(false);
+const consumableSelected = ref();
+let consumableTypes = null;
+let cartridgeColors = null;
 
 const form = useForm({   
     id_printer_workplace: null,
@@ -36,10 +36,10 @@ const form = useForm({
     count: 1,
     step: step,
 })
-const toast = reactive(useToast())
+const toast = reactive(useToast());
 
 onMounted(() => {
-    loadingPrinters.value = true
+    loadingPrinters.value = true;
     axios.get(urls.printers.all())
         .then((response) => {
             if (Array.isArray(response.data)) {
@@ -124,13 +124,22 @@ const onChangePrinterWorkplace = (event) => {
     }
 }
 
+const LogActions = inject('LogActions');
+
 const save = () => {
-    const idConsumable = consumableSelected.value.id_consumable
-    const idConsumableCount = consumableSelected.value.id
-    form.post(urls.consumables.counts.subtract(idConsumable, idConsumableCount), {
+    const idConsumable = consumableSelected.value.id_consumable;
+    const idConsumableCount = consumableSelected.value.id;
+    const url = urls.consumables.counts.subtract(idConsumable, idConsumableCount);
+    form.post(url, {
         onSuccess: () => {
-            dialogRef.value.close()
-            Inertia.get(window.location.href)
+            // статистика посещения            
+            LogActions.save('POST', 'Вычитание расходного материала', {
+                idConsumable: idConsumable,
+                idConsumableCount: idConsumableCount,
+            });
+            
+            dialogRef.value.close();
+            Inertia.get(window.location.href);
         },
     })
 }

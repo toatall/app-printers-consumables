@@ -28,15 +28,17 @@ import 'primeicons/primeicons.css';
 import moment from 'moment/moment';
 import { urls, config } from '@/config';
 import { Auth } from '@/auth';
+import { LogActions } from './logActions';
+
 
 //
 moment.locale('ru');
 
 /* add icons to the library */
-library.add(fas, far, fab)
-dom.watch()
+library.add(fas, far, fab);
+dom.watch();
 
-InertiaProgress.init()
+InertiaProgress.init();
 
 createInertiaApp({
     resolve: name => require(`./Pages/${name}`),
@@ -66,6 +68,7 @@ createInertiaApp({
             .provide('urls', urls) 
             .provide('config', config)      
             .provide('auth', new Auth(props.initialPage.props?.auth?.user?.roles ?? []))
+            .provide('LogActions', new LogActions(props.initialPage.props?.auth?.user))       
             .mount(el)
     },
 })

@@ -7,7 +7,7 @@ import Panel from 'primevue/panel'
 import FileUpload from 'primevue/fileupload'
 import { Inertia } from '@inertiajs/inertia'
 import Checkbox from 'primevue/checkbox'
-import { ref, computed, inject, onMounted } from 'vue'
+import { ref, computed, inject, onMounted, reactive } from 'vue'
 import Menu from 'primevue/menu'
 import ProgressSpinner from 'primevue/progressspinner'
 import Button from 'primevue/button'
@@ -46,13 +46,23 @@ const form = useForm({
     photo: null,
     selectedRoles: userRoles,
     selectedOrganizations: userOrganizations,    
-})
-const title = `${user.fio ?? ''} (${user.name})`
+});
+const formFields = reactive({
+    name: form.name,
+    email: form.email,
+    selected_roles: form.selectedRoles,
+    selected_organizations: form.selectedOrganizations,
+});
+const title = `${user.fio ?? ''} (${user.name})`;
+
+const LogActions = inject('LogActions');
 
 function update() {
-    form.post(urls.users.update(user.id), {
+    const url = urls.users.update(user.id);
+    form.post(url, {
         onSuccess: () => {
-            form.reset('password', 'photo')
+            LogActions.save(url, 'POST', 'Обновление данных пользователя', formFields);
+            form.reset('password', 'photo');
         },
         preserveState: true,
         preserveScroll: true,
@@ -60,15 +70,23 @@ function update() {
 }
 const destroy = () => {
     if (confirm('Вы уверены, что хотите удалить данного пользователя?')) {
-        form.delete(urls.users.delete(user.id), {
-            onSuccess: () => Inertia.get(urls.users.edit(user.id))
+        const url = urls.users.delete(user.id);
+        form.delete(url, {
+            onSuccess: () => {
+                LogActions.save(url, 'DELETE', 'Удаление пользователя', formFields);
+                Inertia.get(urls.users.edit(user.id));
+            },
         })
     }
 }
 const restore = () => {
     if (confirm('Вы уверены, что хотите восстановить данного пользователя?')) {
-        form.put(urls.users.restore(user.id), {
-            onSuccess: () => Inertia.get(urls.users.edit(user.id))
+        const url = urls.users.restore(user.id);
+        form.put(url, {
+            onSuccess: () => {
+                LogActions.save(url, 'PUT', 'Восстановление пользователя', formFields);
+                Inertia.get(urls.users.edit(user.id));
+            },
         })
     }
 }

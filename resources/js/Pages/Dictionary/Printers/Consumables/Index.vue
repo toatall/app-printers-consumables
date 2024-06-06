@@ -42,9 +42,15 @@ watch(
     { deep: true }
 );
 
+const LogActions = inject('LogActions');
+
 const addConsumable = (id) => {
-    Inertia.post(urls.dictionary.printers.consumables.add(printer.id, id), {
-        onSuccess: () => Inertia.get(urls.dictionary.printers.show(printer.id)),
+    const url = urls.dictionary.printers.consumables.add(printer.id, id);
+    Inertia.post(url, {
+        onSuccess: () => {
+            LogActions.save(url, 'POST', 'Добавление привязки к расходному материалу', Object.assign(printer, { id_consumable: id }));
+            Inertia.get(urls.dictionary.printers.show(printer.id));
+        },
     })
 };
 

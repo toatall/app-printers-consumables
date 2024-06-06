@@ -35,6 +35,7 @@ const cartridgeColors = props.cartridgeColors;
 const confirm = useConfirm();
 
 const title = `${props.consumableTypeValue} ${consumable.name}`;
+const LogActions = inject('LogActions');
 
 const createRelation = () => {
     Inertia.get(urls.dictionary.consumables.printers.index(consumable.id));
@@ -45,18 +46,27 @@ const deleteRelation = (id) => {
         message: 'Вы уверены, что хотите удалить связь?',
         header: 'Удаление связи',
         accept: () => {
-            Inertia.delete(urls.dictionary.consumables.printers.delete(consumable.id, id))
+            const url = urls.dictionary.consumables.printers.delete(consumable.id, id);
+            Inertia.delete(url, { onSuccess: () => {
+                LogActions.save(url, 'DELETE', 'Удаление связи с принтером', Object.assign(consumable, { id_printer: id }));
+            }});
         },
     })    
 };
 
 const goToEdit = () => Inertia.get(urls.dictionary.consumables.edit(consumable.id));
+
+
+
 const deleteConsumable = () => {
     confirm.require({
         message: 'Вы уверены, что хотите удалить запись?',
         header: 'Удаление записи',
         accept: () => {
-            Inertia.delete(urls.dictionary.consumables.delete(consumable.id))
+            const url = urls.dictionary.consumables.delete(consumable.id);
+            Inertia.delete(url, { onSuccess: () => {
+                LogActions.save(url, 'DELETE', 'Удаление расходного материала', props.consumable);
+            }});
         },
     })    
 };

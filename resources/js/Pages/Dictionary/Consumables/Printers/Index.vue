@@ -41,9 +41,15 @@ watch(
     { deep: true }
 );
 
+const LogActions = inject('LogActions');
+
 const addPrinter = (id) => {
-    Inertia.post(urls.dictionary.consumables.printers.add(consumable.id, id), {
-        onSuccess: () => Inertia.get(urls.dictionary.components.show(consumable.id)),
+    const url = urls.dictionary.consumables.printers.add(consumable.id, id);
+    Inertia.post(url, {
+        onSuccess: () => {
+            LogActions.save(url, 'POST', 'Добавление связи с принтером', Object.assign(consumable, { id_printer: id }));
+            Inertia.get(urls.dictionary.components.show(consumable.id));
+        },
     })
 };
 

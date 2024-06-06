@@ -15,10 +15,19 @@ const form = useForm({
     count: 1,
     selectedOrganizations: [dialogRef.value.data.organizations],
 });
+const LogActions = inject('LogActions');
+
 const save = () => {        
-    form.put(urls.consumables.counts.update(dialogRef.value.data.id), {
+    const url = urls.consumables.counts.update(dialogRef.value.data.id);
+    form.put(url, {
         onSuccess: () => {
-            dialogRef.value.close()
+            LogActions.save(url, 'PUT', 'Добавление количества расходных материалов', {
+                id_consumable: form.id_consumable,
+                count: form.count,
+                selected_organizations: form.selectedOrganizations,
+            });
+
+            dialogRef.value.close();
         },
     })    
 };

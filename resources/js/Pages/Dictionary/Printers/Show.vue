@@ -35,12 +35,20 @@ const confirm = useConfirm();
 
 const title = `${printer.vendor} ${printer.model}`;
 const goToEdit = () => Inertia.get(urls.dictionary.printers.edit(printer.id));
+
+const LogActions = inject('LogActions');
+
 const deletePrinter = () => {
     confirm.require({
         message: 'Вы уверены, что хотите удалить запись?',
         header: 'Удаление записи',
         accept: () => {
-            Inertia.delete(urls.dictionary.printers.delete(printer.id));
+            const url = urls.dictionary.printers.delete(printer.id);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление принтера', printer);
+                },
+            });
         },
     })    
 };
@@ -54,7 +62,12 @@ const deleteRelation = (id) => {
         message: 'Вы уверены, что хотите удалить связь?',
         header: 'Удаление связи',
         accept: () => {
-            Inertia.delete(urls.dictionary.printers.consumables.delete(printer.id, id));
+            const url = urls.dictionary.printers.consumables.delete(printer.id, id);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление связи с расходным материалом', Object.assign(printer, { id_consumable: id }));
+                },
+            });
         },
     })    
 };

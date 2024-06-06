@@ -28,12 +28,29 @@ const form = useForm({
     is_color_print: printer.is_color_print,    
 });
 
+const LogActions = inject('LogActions');
+const formFields = reactive({
+    vendor: form.vendor,
+    model: form.model,
+    is_color_print: form.is_color_print,
+})
+
 const save = () => {    
     if (props.isNew) {
-        form.post(urls.dictionary.printers.index());
+        const url = urls.dictionary.printers.index();
+        form.post(url, {
+            onSuccess: () => {
+                LogActions.save(url, 'POST', 'Добавление принтера', formFields);
+            },
+        });
     }
     else {
-        form.put(urls.dictionary.printers.update(printer.id));
+        const url = urls.dictionary.printers.update(printer.id);
+        form.put(url, {
+            onSuccess: () => {
+                LogActions.save(url, 'PUT', 'Обновление принтера', formFields);
+            },
+        });
     }
 };
 
@@ -42,9 +59,14 @@ const destroy = () => {
         message: 'Вы уверены, что хотите удалить?',
         header: 'Удаление',
         accept: () => {
-            Inertia.delete(urls.dictionary.printers.delete(printer.id));
+            const url = urls.dictionary.printers.delete(printer.id);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление принтера', formFields);
+                },
+            });
         },
-    })    
+    });
 };
 
 </script>

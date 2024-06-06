@@ -26,13 +26,30 @@ const form = useForm({
     inventory_number: printerWorkplace.inventory_number,
     org_code: printerWorkplace.org_code,
 });
+
+const formFields = reactive({
+    id: form.id,
+    id_printer: form.id_printer,        
+    location: form.location,
+    serial_number: form.serial_number,
+    inventory_number: form.inventory_number,
+    org_code: form.org_code,
+})
+
+// статистика посещения
+const LogActions = inject('LogActions');
+
 const isNew = printerWorkplace.id === null;
 const save = () => {    
     if (isNew) {
-        form.post(urls.printers.store())
+        form.post(urls.printers.store(), { onSuccess: () => {
+            LogActions.save('POST', 'Сохранение нового принтера на рабочем месте', formFields);
+        }})
     }
     else {
-        form.put(urls.printers.update(printerWorkplace.id))
+        form.put(urls.printers.update(printerWorkplace.id), { onSuccess: () => {
+            LogActions.save('PUT', 'Обновление принтера на рабочем месте', formFields);
+        }});
     }
 };
 
@@ -42,7 +59,8 @@ const organizationChange = (value) => {
 }
 onMounted(() => {
     organizationSelected.value = { [printerWorkplace.org_code]: true };
-})
+});
+
 
 </script>
 <template>

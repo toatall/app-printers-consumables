@@ -93,9 +93,20 @@ const form = useForm({
     count: 1,
     selectedOrganizations: Array.from(props.organizations).map((item) => item.code),
 });
+
+const LogActions = inject('LogActions');
 const saveOrganizations = () => {
-    form.put(urls.consumables.counts.updateOrganizations(props.consumableCount.id), {
-        onSuccess: () => visibleOrganizationsEdit.value = false
+    const url = urls.consumables.counts.updateOrganizations(props.consumableCount.id);
+    form.put(url, {
+        onSuccess: () => {
+            // статистика посещения            
+            LogActions.save(url, 'PUT', 'Обновление списка организаций', {
+                id_consumable: form.id_consumable,                
+                selected_organizations: form.selectedOrganizations,
+            });
+
+            visibleOrganizationsEdit.value = false;
+        }
     })
 };
 

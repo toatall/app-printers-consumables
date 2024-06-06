@@ -53,12 +53,26 @@ const colors = computed(() => {
     return res;
 });
 
+const LogActions = inject('LogActions');
+const formFields = reactive({
+    type: form.type,
+    name: form.name,
+    color: form.color,
+    description: form.description,
+});
+
 const save = () => {    
-    if (props.isNew) {    
-        form.post(urls.dictionary.consumables.store());
+    if (props.isNew) {
+        const url = urls.dictionary.consumables.store();
+        form.post(url, { onSuccess: () => {
+            LogActions.save(url, 'POST', 'Создание расходного материала', formFields);    
+        }});
     }
     else {
-        form.put(urls.dictionary.consumables.update(consumable.id));
+        const url = urls.dictionary.consumables.update(consumable.id);
+        form.put(url, { onSuccess: () => {
+            LogActions.save(url, 'PUT', 'Обновление расходного материала', formFields);
+        }});
     }
 };
 

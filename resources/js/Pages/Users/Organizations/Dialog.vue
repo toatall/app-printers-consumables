@@ -42,13 +42,20 @@ const loadData = () => {
         })
 }
 
+const LogActions = inject('LogActions');
+
 const change = (code, event) => {
     if (code !== selectedOrganization.value) {
         saving.value = true;
-        Inertia.post(urls.users.organizations.change(code), {}, {
+        const url = urls.users.organizations.change(code);
+        Inertia.post(url, {}, {
             onFinish: () => {
-                dialogClose()                
-                Inertia.get(window.location.href)
+                LogActions.save(url, 'POST', 'Изменение организации у пользователя', {
+                    code: code,
+                });
+                
+                dialogClose();                
+                Inertia.get(window.location.href);                
             }
         })
     }

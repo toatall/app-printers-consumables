@@ -76,12 +76,21 @@ onMounted(() => {
         .finally(() => loading.value = false)
 });
 
+const LogActions = inject('LogActions');
+
 const save = () => {            
-    const idConsumable = dialogRef.value.data.idConsumable
-    const idConsumableCount = dialogRef.value.data.idConsumableCount
-    form.post(urls.consumables.counts.subtract(idConsumable, idConsumableCount), {
+    const idConsumable = dialogRef.value.data.idConsumable;
+    const idConsumableCount = dialogRef.value.data.idConsumableCount;
+    const url = urls.consumables.counts.subtract(idConsumable, idConsumableCount);
+    form.post(url, {
         onSuccess: () => {
-            dialogRef.value.close()
+            LogActions.save(url, 'POST', 'Вычитание расходных материалов', {
+                id_consumable: form.id_consumable,
+                count: form.count,
+                id_printer_workplace: form.id_printer_workplace,
+            });    
+
+            dialogRef.value.close();
         },
     })
 };

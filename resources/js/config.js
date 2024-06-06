@@ -280,4 +280,11 @@ export const urls = {
         },
 
     },
+
+    // статистика
+    logActions: {
+        // сохранение
+        save: 'http://86000-app045:4785/view/save',
+    },
+
 }

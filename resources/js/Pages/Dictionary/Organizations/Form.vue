@@ -23,12 +23,25 @@ const form = useForm({
     parent: organization.parent,
 });
 
+const LogActions = inject('LogActions');
+const formFields = reactive({
+    code: form.organization,
+    name: form.name,
+    parent: form.parent,
+});
+
 const save = () => {    
     if (props.isNew) {
-        form.post(urls.dictionary.organizations.store());
+        const url = urls.dictionary.organizations.store();
+        form.post(url, { onSuccess: () => {
+            LogActions.save(url, 'POST', 'Добавление организации', formFields);
+        }});
     }
     else {
-        form.put(urls.dictionary.organizations.update(organization.code));
+        const url = urls.dictionary.organizations.update(organization.code);
+        form.put(url, { onSuccess: () => {
+            LogActions.save(url, 'PUT', 'Обновление организации', formFields);
+        }});
     }
 };
 
@@ -37,7 +50,12 @@ const destroy = () => {
         message: 'Вы уверены, что хотите удалить?',
         header: 'Удаление',
         accept: () => {
-            Inertia.delete(urls.dictionary.organizations.delete(organization.code));
+            const url = urls.dictionary.organizations.delete(organization.code);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление организации', organization);
+                },
+            });
         },
     });
 };

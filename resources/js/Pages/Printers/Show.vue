@@ -35,12 +35,21 @@ const printer = props.printerWorkplace.printer;
 const printerWorkplace = props.printerWorkplace;
 const printerLabels = props.printerLabels;
 
+const LogActions = inject('LogActions');
+
 const actions = {
     edit: () => Inertia.get(urls.printers.edit(printerWorkplace.id)),
     delete: () => confirm.require({
         message: 'Вы уверены, что хотите удалить?',
         header: 'Удаление',
-        accept: () => Inertia.delete(urls.printers.delete(printerWorkplace.id)),
+        accept: () => {
+            const url = urls.printers.delete(printerWorkplace.id);
+            Inertia.delete(url, {
+                onSuccess: () => {
+                    LogActions.save(url, 'DELETE', 'Удаление принтера с рабочего места', printerWorkplace);
+                },
+            });
+        },
     }),
 };
 const title = `${printer.vendor} ${printer.model} (${printerWorkplace.location})`;
